@@ -11,7 +11,7 @@ main {
 }
 
 footer {
-    padding: 10px;
+    padding-bottom: 2%;
     text-align: center;
 }
 
@@ -19,6 +19,13 @@ footer {
 *{
     color: #fff;
     font-size: 14px;
+}
+
+.total-sum-container{
+    text-align: end;
+    font-size: medium;
+    padding-bottom: 2%;
+    font-weight: bold;
 }
 
 #Update{

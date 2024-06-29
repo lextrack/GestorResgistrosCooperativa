@@ -16,6 +16,30 @@ function validateForm(){
     return true;
 }
 
+function formatCurrency(value) {
+    return parseFloat(value).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+}
+
+function formatInputPrice(input) {
+    let value = input.value.replace(/\D/g, ''); // Remove all non-digit characters
+    let formattedValue = '';
+
+    if (value.length > 2) {
+        let integerPart = value.slice(0, -2);
+        let decimalPart = value.slice(-2);
+
+        formattedValue = `${parseInt(integerPart).toLocaleString('es-CL')},${decimalPart}`;
+    } else if (value.length === 2) {
+        formattedValue = `0,${value}`;
+    } else if (value.length === 1) {
+        formattedValue = `0,0${value}`;
+    } else {
+        formattedValue = '';
+    }
+
+    input.value = formattedValue;
+}
+
 function showData(){
     var productList;
     if(localStorage.getItem("productList") == null) {
@@ -33,24 +57,29 @@ function showData(){
     var displayedProducts = productList.slice(startIndex, endIndex);
 
     var html = "";
+    var totalSum = 0; 
     displayedProducts.forEach(function (element, index){
+        let originalIndex = productList.length - 1 - (startIndex + index); 
         html += "<tr>";
         html += "<td>" + element.articulo + "</td>";
         html += "<td>" + element.cantidad + "</td>";
-        html += "<td>" + element.precio + "</td>";
-        html += "<td>" + element.total + "</td>";
+        html += "<td>" + formatCurrency(element.precio) + "</td>";
+        html += "<td>" + formatCurrency(element.total) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
         html += "<td>" + element.fecha + "</td>";
         html += 
         '<td><button onclick="deleteData(' + 
-        index +
+        originalIndex +
         ')" class="btn btn-danger">Borrar</button><button onclick="updateData(' + 
-        index +
+        originalIndex +
         ')" class="btn btn-warning m-1">Editar</button></td>';
         html += "</tr>";
+
+        totalSum += parseFloat(element.total);
     });
 
     document.querySelector("#crudTable tbody").innerHTML = html;
+    calculateTotalSum();
 
     let paginationHtml = '<button class="btn btn-danger" onclick="changePage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>&lt;</button>';
     paginationHtml += '<button class="btn btn-danger" onclick="changePage(1)">Primero</button>';
@@ -97,10 +126,10 @@ function AddData(){
     if(validateForm() == true){
         var articulo = document.getElementById("articulo").value;
         var cantidad = document.getElementById("cantidad").value;
-        var precio = document.getElementById("precio").value;
+        var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
         var proveedor = document.getElementById("proveedor").value;
         var fecha = document.getElementById("fecha").value;
-        var total = parseInt(cantidad) * parseInt(precio);
+        var total = parseInt(cantidad) * precio;
 
         var productList;
         if(localStorage.getItem("productList") == null){
@@ -122,11 +151,12 @@ function AddData(){
         localStorage.setItem("productList", JSON.stringify(productList));
         showData();
         document.getElementById("articulo").value = "";
-        document.getElementById("cantidad").value = "";
-        document.getElementById("precio").value = "";
+        document.getElementById("cantidad").value = "0";
+        document.getElementById("precio").value = "0"; 
         document.getElementById("total").value = "";
         document.getElementById("proveedor").value = "";
         document.getElementById("fecha").value = "";
+        calculateTotalSum(); 
     }
 }
 
@@ -142,6 +172,7 @@ function deleteData(index){
     productList.splice(index, 1);
     localStorage.setItem("productList", JSON.stringify(productList));
     showData();
+    calculateTotalSum();
 }
 
 function updateData(index){
@@ -171,8 +202,8 @@ function updateData(index){
         if(validateForm() == true){
             productList[index].articulo = document.getElementById("articulo").value;
             productList[index].cantidad = document.getElementById("cantidad").value;
-            productList[index].precio = document.getElementById("precio").value;
-            productList[index].total = parseInt(document.getElementById("cantidad").value) * parseInt(document.getElementById("precio").value);
+            productList[index].precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
+            productList[index].total = parseInt(document.getElementById("cantidad").value) * productList[index].precio;
             productList[index].proveedor = document.getElementById("proveedor").value;
             productList[index].fecha = document.getElementById("fecha").value;
 
@@ -181,8 +212,8 @@ function updateData(index){
             showData();
 
             document.getElementById("articulo").value = "";
-            document.getElementById("cantidad").value = "";
-            document.getElementById("precio").value = "";
+            document.getElementById("cantidad").value = "0";
+            document.getElementById("precio").value = "0"; 
             document.getElementById("total").value = "";
             document.getElementById("proveedor").value = "";
             document.getElementById("fecha").value = "";
@@ -193,10 +224,22 @@ function updateData(index){
     }
 }
 
+function calculateTotalSum() {
+    var productList;
+    if (localStorage.getItem("productList") == null) {
+        productList = [];
+    } else {
+        productList = JSON.parse(localStorage.getItem("productList"));
+    }
+
+    var totalSum = productList.reduce((sum, product) => sum + parseFloat(product.total), 0);
+    document.getElementById("totalSum").innerText = totalSum.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+}
+
 function updateTotal(){
     var cantidad = document.getElementById("cantidad").value;
-    var precio = document.getElementById("precio").value;
-    document.getElementById("total").value = parseInt(cantidad) * parseInt(precio);
+    var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
+    document.getElementById("total").value = parseInt(cantidad) * precio;
 }
 
 function searchData(){
@@ -216,8 +259,8 @@ function searchData(){
       html += "<tr>";
       html += "<td>" + element.articulo + "</td>";
       html += "<td>" + element.cantidad + "</td>";
-      html += "<td>" + element.precio + "</td>";
-      html += "<td>" + element.total + "</td>";
+      html += "<td>" + formatCurrency(element.precio) + "</td>";
+      html += "<td>" + formatCurrency(element.total) + "</td>";
       html += "<td>" + element.proveedor + "</td>";
       html += "<td>" + element.fecha + "</td>";
       html +=
@@ -278,4 +321,3 @@ function exportToJSON() {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
-

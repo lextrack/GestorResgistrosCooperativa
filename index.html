@@ -27,12 +27,12 @@
                 <div class="form-group col-md-6 mb-3">
                     <label for="name">Cantidad</label>
                     <input type="number" name="cantidad" class="form-control" 
-                    id="cantidad" placeholder="Enter the incomings of the product">
+                    id="cantidad" value="0" placeholder="Enter the incomings of the product">
                 </div>
                 <div class="form-group col-md-6 mb-3">
                     <label for="name">Precio</label>
-                    <input type="number" name="precio" class="form-control" 
-                    id="precio" placeholder="Enter the price">
+                    <input type="text" name="precio" class="form-control" 
+                    id="precio" value="0" placeholder="Enter the price" oninput="formatInputPrice(this)">                    
                 </div>
                 <div class="form-group col-md-6 mb-3">
                     <label for="name">Proveedor</label>
@@ -72,7 +72,7 @@
             <div class="col-lg-12">
                 <table class="table table-dark table-hover" id="crudTable">
                     <div class="input-group mt-2">
-                        <input type="text" class="form-control" placeholder="Search for an item" aria-label="Search" aria-describedby="search-addon" id="searchInput"/>
+                        <input type="text" class="form-control" placeholder="Buscar una transacción por nombre o proveedor" aria-label="Search" aria-describedby="search-addon" id="searchInput"/>
                         <button onclick="searchData()" class="btn btn-success">Buscar</button>
                       </div>
                     <thead>
@@ -89,6 +89,9 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div id="totalSumContainer" class="total-sum-container">
+                    Suma total: <span id="totalSum">0</span>
+                </div>
             </div>
         </div>
     </div>
