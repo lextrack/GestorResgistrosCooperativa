@@ -1,0 +1,93 @@
+body{
+    background-color: #12181ff5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    padding: 10px;
+    text-align: center;
+}
+
+
+*{
+    color: #fff;
+    font-size: 14px;
+}
+
+#Update{
+    display: none;
+}
+
+.titles{
+    text-align: center;
+    color: white;
+}
+
+#searchInput{
+    display: flex;
+    text-align: left;
+    color: black;
+}
+
+#total{
+    display: none;
+}
+
+.nav-link{
+    color: crimson;
+}
+
+.border {
+    border-width: 2px !important;
+}
+
+
+.dropdown{
+    margin: 3px;
+    padding-left: 10px;
+}
+
+.table th, .table td {
+    text-align: center; 
+    vertical-align: middle; 
+}
+
+/* Personaliza el botón del dropdown */
+.custom-dropdown-button {
+    background-color: #6c757d; /* Cambia el color del botón */
+    border: none; /* Elimina el borde del botón */
+    border-radius: 5px; /* Redondea las esquinas del botón */
+    
+    transition: background-color 0.3s ease; /* Añade una transición suave al cambiar el color de fondo */
+    color: #fff;
+}
+
+.custom-dropdown-button:hover {
+    background-color: #5a6268; /* Cambia el color de fondo al pasar el ratón */
+}
+
+/* Personaliza los elementos del menú */
+.custom-dropdown-item {
+    transition: background-color 0.3s ease; /* Añade una transición suave al cambiar el color de fondo */
+    color: #fff;
+}
+
+.custom-dropdown-item:hover {
+    background-color: #f8f9fa; /* Cambia el color de fondo al pasar el ratón */
+    color: #343a40; /* Cambia el color del texto al pasar el ratón */
+}
+
+/* Personaliza el menú desplegable */
+.dropdown-menu {
+    background-color: #343a40; /* Cambia el color de fondo del menú */
+    border-radius: 5px; /* Redondea las esquinas del menú */
+    border: none; /* Elimina el borde del menú */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra suave al menú */
+}
