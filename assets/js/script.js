@@ -248,10 +248,7 @@ function searchData(){
     var searchedProducts = productList.filter(function(articulo) {
       return (
         articulo.articulo.toLowerCase().includes(searchInput.toLowerCase()) ||
-        articulo.cantidad.toLowerCase().includes(searchInput.toLowerCase()) ||
-        articulo.precio.toLowerCase().includes(searchInput.toLowerCase()) ||
-        articulo.proveedor.toLowerCase().includes(searchInput.toLowerCase()) ||
-        articulo.fecha.toLowerCase().includes(searchInput.toLowerCase())
+        articulo.proveedor.toLowerCase().includes(searchInput.toLowerCase())
       );
     });
     var html = "";
