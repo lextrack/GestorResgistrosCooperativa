@@ -23,6 +23,9 @@ function showData(){
     } else {
         productList = JSON.parse(localStorage.getItem("productList"));
     }
+
+    productList.reverse();
+
     totalPages = Math.ceil(productList.length / itemsPerPage);
 
     var startIndex = (currentPage - 1) * itemsPerPage;
@@ -75,7 +78,9 @@ function showData(){
     document.querySelector("#pagination").innerHTML = paginationHtml;
 }
 
-document.onload = showData();
+document.addEventListener('DOMContentLoaded', (event) => {
+    showData();
+});
 
 function changePage(newPage) {
     if (newPage < 1) {
@@ -233,11 +238,10 @@ function exportToExcel() {
     var workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DatosTransacciones');
 
-    // Obtener la fecha actual
-    var currentDate = new Date();
-    var dateFormatted = currentDate.toISOString().slice(0,10); // Formato YYYY-MM-DD
 
-    // Nombre del archivo con la fecha actual
+    var currentDate = new Date();
+    var dateFormatted = currentDate.toISOString().slice(0,10);
+
     var fileName = 'DatosTransacciones_' + dateFormatted + '.xlsx';
 
     XLSX.writeFile(workbook, fileName);
@@ -258,10 +262,9 @@ function exportToJSON() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(productList));
 
-    // Obtener la fecha y hora actual en formato YYYY-MM-DD_HH-MM-SS
     var currentDate = new Date();
     var day = String(currentDate.getDate()).padStart(2, '0');
-    var month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Los meses comienzan en 0
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
     var year = currentDate.getFullYear();
     var hours = String(currentDate.getHours()).padStart(2, '0');
     var minutes = String(currentDate.getMinutes()).padStart(2, '0');
