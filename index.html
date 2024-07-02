@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CRUD en html, css y js">
+    <meta name="description" content="Registro de transacciones">
     <meta name="author" content="Lextrack">
     <title>Gestor de transacciones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" 
@@ -44,6 +44,72 @@
                     <input type="date" name="fecha" class="form-control" 
                     id="fecha" placeholder="Enter the date">
                 </div>
+                <div class="form-group col-md-6 mb-3">
+                    <label for="categoria">Categoría</label>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" id="dropdownCategoria" data-bs-toggle="dropdown" aria-expanded="false">
+                            Seleccionar Categoría
+                        </button>
+                        <ul class="dropdown-menu multi-column-dropdown" aria-labelledby="dropdownCategoria">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Actividades externas')">Actividades externas</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Actividades internas')">Actividades internas</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Agua')">Agua</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Aseo')">Aseo</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Asesoria')">Asesoria</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Asesoria')">Asesoria</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Auditoria')">Auditoria</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('B. permanencia')">B. permanencia</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Beneficio escolar')">Beneficio escolar</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Capacitación')">Capacitación</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Capital humano')">Capital humano</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Comercial')">Comercial</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Computacion')">Computacion</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Convenios')">Convenios</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Dicom')">Dicom</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Diseñador grafico')">Diseñador grafico</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Encomiendas')">Encomiendas</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Equipos computacionales')">Equipos computacionales</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Gastos de materiales y útiles de oficina')">Gastos de materiales y útiles de oficina</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Gastos legales - notariales y asesorias')">Gastos legales - notariales y asesorias</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Guardia de seguridad')">Guardia de seguridad</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Imagen')">Imagen</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Imprenta encuadernacion')">Imprenta encuadernacion</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Informatica y certificados')">Informatica y certificados</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Leyes sociales')">Leyes sociales</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Luz')">Luz</a></li>
+                                </div>
+                                <div class="col-sm-6">
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Mantencion y gastos menores de equipos computacionales')">Mantencion y gastos menores de equipos computacionales</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Memorias')">Memorias</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Mensajeria masivo')">Mensajeria masivo</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Monitores')">Monitores</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Muebles y enseres')">Muebles y enseres</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Otros activos fijos')">Otros activos fijos</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Pagina web')">Pagina web</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Proveedores')">Proveedores</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Publicidad')">Publicidad</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Remuneraciones')">Remuneraciones</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Reparaciones menores')">Reparaciones menores</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Seguridad')">Seguridad</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Seguros')">Seguros</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Software')">Software</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Soporte desarrollo erp')">Soporte desarrollo erp</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Telefonia')">Telefonia</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Trabajos varios estructura')">Trabajos varios estructura</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Uniforme')">Uniforme</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Utiles de aseo y oficina')">Utiles de aseo y oficina</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Vacaciones')">Vacaciones</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Viaticos y pasajes')">Viaticos y pasajes</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Wifi - internet')">Wifi - internet</a></li>
+                                </div>
+                            </div>
+                        </ul>                                                                                      
+                    </div>
+                </div>
+                <input type="hidden" name="categoria" id="categoria">
+
                 <div class="col-lg-12 d-flex justify-content-between align-items-center">
                     <button class="btn btn-success" id="Submit" onclick="AddData()">Añadir registro</button>
                     <div>
@@ -84,6 +150,7 @@
                             <th class="titles">Total</th>
                             <th class="titles">Proveedor</th>
                             <th class="titles">Fecha</th>
+                            <th class="titles">Categoría</th>
                             <th class="titles">Acciones</th>
                         </tr>
                     </thead>

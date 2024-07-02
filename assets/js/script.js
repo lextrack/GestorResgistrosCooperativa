@@ -16,12 +16,18 @@ function validateForm(){
     return true;
 }
 
+function selectCategoria(categoria) {
+    document.getElementById("categoria").value = categoria;
+
+    document.getElementById("dropdownCategoria").innerHTML = categoria;
+}
+
 function formatCurrency(value) {
     return parseFloat(value).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
 }
 
 function formatInputPrice(input) {
-    let value = input.value.replace(/\D/g, ''); // Remove all non-digit characters
+    let value = input.value.replace(/\D/g, '');
     let formattedValue = '';
 
     if (value.length > 2) {
@@ -40,9 +46,9 @@ function formatInputPrice(input) {
     input.value = formattedValue;
 }
 
-function showData(){
+function showData() {
     var productList;
-    if(localStorage.getItem("productList") == null) {
+    if (localStorage.getItem("productList") == null) {
         productList = [];
     } else {
         productList = JSON.parse(localStorage.getItem("productList"));
@@ -57,9 +63,9 @@ function showData(){
     var displayedProducts = productList.slice(startIndex, endIndex);
 
     var html = "";
-    var totalSum = 0; 
-    displayedProducts.forEach(function (element, index){
-        let originalIndex = productList.length - 1 - (startIndex + index); 
+    var totalSum = 0;
+    displayedProducts.forEach(function (element, index) {
+        let originalIndex = productList.length - 1 - (startIndex + index);
         html += "<tr>";
         html += "<td>" + element.articulo + "</td>";
         html += "<td>" + element.cantidad + "</td>";
@@ -67,12 +73,13 @@ function showData(){
         html += "<td>" + formatCurrency(element.total) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
         html += "<td>" + element.fecha + "</td>";
-        html += 
-        '<td><button onclick="deleteData(' + 
-        originalIndex +
-        ')" class="btn btn-danger">Borrar</button><button onclick="updateData(' + 
-        originalIndex +
-        ')" class="btn btn-warning m-1">Editar</button></td>';
+        html += "<td>" + element.categoria + "</td>";
+        html +=
+            '<td><button onclick="deleteData(' +
+            originalIndex +
+            ')" class="btn btn-danger">Borrar</button><button onclick="updateData(' +
+            originalIndex +
+            ')" class="btn btn-warning m-1">Editar</button></td>';
         html += "</tr>";
 
         totalSum += parseFloat(element.total);
@@ -122,43 +129,50 @@ function changePage(newPage) {
     showData();
 }
 
-function AddData(){
-    if(validateForm() == true){
+function AddData() {
+    if (validateForm()) {
         var articulo = document.getElementById("articulo").value;
         var cantidad = document.getElementById("cantidad").value;
-        var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
+        var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'));
         var proveedor = document.getElementById("proveedor").value;
         var fecha = document.getElementById("fecha").value;
         var total = parseInt(cantidad) * precio;
+        var categoria = document.getElementById("categoria").value;
 
         var productList;
-        if(localStorage.getItem("productList") == null){
+        if (localStorage.getItem("productList") == null) {
             productList = [];
-        }
-        else{
+        } else {
             productList = JSON.parse(localStorage.getItem("productList"));
         }
-    
+
         productList.push({
-            articulo : articulo,
+            articulo: articulo,
             cantidad: cantidad,
-            precio : precio,
-            proveedor : proveedor,
-            fecha : fecha,
+            precio: precio,
+            proveedor: proveedor,
+            fecha: fecha,
             total: total,
+            categoria: categoria
         });
 
         localStorage.setItem("productList", JSON.stringify(productList));
-        showData();
+        showData(); 
+        
         document.getElementById("articulo").value = "";
         document.getElementById("cantidad").value = "0";
-        document.getElementById("precio").value = "0"; 
+        document.getElementById("precio").value = "0";
         document.getElementById("total").value = "";
         document.getElementById("proveedor").value = "";
         document.getElementById("fecha").value = "";
-        calculateTotalSum(); 
+        document.getElementById("categoria").value = ""; 
+
+        document.getElementById("dropdownCategoria").innerHTML = "Seleccionar Categoría";
+
+        calculateTotalSum();
     }
 }
+
 
 function deleteData(index){
     var productList;
@@ -196,16 +210,18 @@ function updateData(index){
     document.getElementById("total").value = productList[index].total;
     document.getElementById("proveedor").value = productList[index].proveedor;
     document.getElementById("fecha").value = productList[index].fecha;
+    document.getElementById("categoria").value = productList[index].categoria;
 
     document.querySelector("#Update").onclick = function(){
 
         if(validateForm() == true){
             productList[index].articulo = document.getElementById("articulo").value;
             productList[index].cantidad = document.getElementById("cantidad").value;
-            productList[index].precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
+            productList[index].precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'));
             productList[index].total = parseInt(document.getElementById("cantidad").value) * productList[index].precio;
             productList[index].proveedor = document.getElementById("proveedor").value;
             productList[index].fecha = document.getElementById("fecha").value;
+            productList[index].categoria = document.getElementById("categoria").value;
 
             localStorage.setItem("productList", JSON.stringify(productList));
 
@@ -213,11 +229,13 @@ function updateData(index){
 
             document.getElementById("articulo").value = "";
             document.getElementById("cantidad").value = "0";
-            document.getElementById("precio").value = "0"; 
+            document.getElementById("precio").value = "0";
             document.getElementById("total").value = "";
             document.getElementById("proveedor").value = "";
             document.getElementById("fecha").value = "";
 
+            document.getElementById("dropdownCategoria").innerHTML = "Seleccionar Categoría";
+        
             document.getElementById("Submit").style.display = "block";
             document.getElementById("Update").style.display = "none";
         }
@@ -238,7 +256,7 @@ function calculateTotalSum() {
 
 function updateTotal(){
     var cantidad = document.getElementById("cantidad").value;
-    var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')); // Remove thousands separator and replace comma with dot
+    var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'));
     document.getElementById("total").value = parseInt(cantidad) * precio;
 }
 
@@ -277,7 +295,6 @@ function exportToExcel() {
     var worksheet = XLSX.utils.json_to_sheet(productList);
     var workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DatosTransacciones');
-
 
     var currentDate = new Date();
     var dateFormatted = currentDate.toISOString().slice(0,10);

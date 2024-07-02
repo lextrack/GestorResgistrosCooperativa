@@ -15,6 +15,17 @@ footer {
     text-align: center;
 }
 
+.multi-column-dropdown {
+    column-count: 1;
+    column-gap: 2rem;
+}
+
+.dropdown-item.custom-dropdown-item {
+    font-size: 0.85rem; 
+    text-transform: capitalize;
+    text-wrap: inherit;
+}
+
 
 *{
     color: #fff;
@@ -57,8 +68,7 @@ footer {
 
 
 .dropdown{
-    margin: 3px;
-    padding-left: 10px;
+    margin: 2px;
 }
 
 .table th, .table td {
@@ -66,35 +76,32 @@ footer {
     vertical-align: middle; 
 }
 
-/* Personaliza el botón del dropdown */
 .custom-dropdown-button {
-    background-color: #6c757d; /* Cambia el color del botón */
-    border: none; /* Elimina el borde del botón */
-    border-radius: 5px; /* Redondea las esquinas del botón */
+    background-color: #6c757d;
+    border: none; 
+    border-radius: 5px; 
     
-    transition: background-color 0.3s ease; /* Añade una transición suave al cambiar el color de fondo */
+    transition: background-color 0.3s ease; 
     color: #fff;
 }
 
 .custom-dropdown-button:hover {
-    background-color: #5a6268; /* Cambia el color de fondo al pasar el ratón */
+    background-color: #198754; 
 }
 
-/* Personaliza los elementos del menú */
 .custom-dropdown-item {
-    transition: background-color 0.3s ease; /* Añade una transición suave al cambiar el color de fondo */
+    transition: background-color 0.3s ease; 
     color: #fff;
 }
 
 .custom-dropdown-item:hover {
-    background-color: #f8f9fa; /* Cambia el color de fondo al pasar el ratón */
-    color: #343a40; /* Cambia el color del texto al pasar el ratón */
+    background-color: #f8f9fa; 
+    color: #343a40; 
 }
 
-/* Personaliza el menú desplegable */
 .dropdown-menu {
-    background-color: #343a40; /* Cambia el color de fondo del menú */
-    border-radius: 5px; /* Redondea las esquinas del menú */
-    border: none; /* Elimina el borde del menú */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra suave al menú */
+    background-color: #343a40; 
+    border-radius: 5px; 
+    border: none; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
