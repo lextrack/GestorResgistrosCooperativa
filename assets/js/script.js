@@ -27,24 +27,16 @@ function formatCurrency(value) {
 }
 
 function formatInputPrice(input) {
-    let value = input.value.replace(/\D/g, '');
+    let value = input.value.replace(/\D/g, ''); // Eliminar cualquier carácter que no sea un dígito
     let formattedValue = '';
 
-    if (value.length > 2) {
-        let integerPart = value.slice(0, -2);
-        let decimalPart = value.slice(-2);
-
-        formattedValue = `${parseInt(integerPart).toLocaleString('es-CL')},${decimalPart}`;
-    } else if (value.length === 2) {
-        formattedValue = `0,${value}`;
-    } else if (value.length === 1) {
-        formattedValue = `0,0${value}`;
-    } else {
-        formattedValue = '';
+    if (value.length > 0) {
+        formattedValue = parseInt(value).toLocaleString('es-CL');
     }
 
     input.value = formattedValue;
 }
+
 
 function showData() {
     var productList;
