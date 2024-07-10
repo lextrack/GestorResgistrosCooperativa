@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Registro de transacciones">
+    <meta name="author" content="Lextrack">
+    <title>Gestor de transacciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" href="assets/imgs/icono.ico" />
+    <link rel="stylesheet" href="assets/css/main.css"/>
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-2">
+            <div class="col-12">
+                <a href="index.html" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <button id="downloadPNG" class="btn btn-sm btn-primary">
+                    <i class="bi bi-file-earmark-image"></i> Descargar PNG
+                </button>
+            </div>
+        </div>
+        <div class="h2 pb-2 mb-4 text-info text-center border-bottom border-info mt-3 md-3">
+            Estadísticas
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12 text-center">
+                <h4>Categoría con más registros</h4>
+                <p class="Textcategoria" id="mostRegisteredCategory"></p>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <canvas id="averageSpendingChart"></canvas>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <canvas id="mostExpensiveCategoryChart"></canvas>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <canvas id="leastExpensiveCategoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+    crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-labels@1.1.0/dist/chartjs-plugin-labels.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

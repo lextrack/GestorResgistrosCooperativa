@@ -27,7 +27,7 @@ function formatCurrency(value) {
 }
 
 function formatInputPrice(input) {
-    let value = input.value.replace(/\D/g, ''); // Eliminar cualquier carácter que no sea un dígito
+    let value = input.value.replace(/\D/g, '');
     let formattedValue = '';
 
     if (value.length > 0) {
@@ -149,8 +149,8 @@ function AddData() {
         });
 
         localStorage.setItem("productList", JSON.stringify(productList));
-        showData(); 
-        
+        showData();
+
         document.getElementById("articulo").value = "";
         document.getElementById("cantidad").value = "0";
         document.getElementById("precio").value = "0";
@@ -164,7 +164,6 @@ function AddData() {
         calculateTotalSum();
     }
 }
-
 
 function deleteData(index){
     var productList;
