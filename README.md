@@ -18,7 +18,7 @@ Este proyecto permite a los usuarios registrar transacciones con detalles como e
 - Paginación de registros.
 - Suma total de transacciones.
 
-Tecnologías Utilizadas
+### Tecnologías Utilizadas
 
 - HTML5
 - CSS3 (Bootstrap 5.3.3)

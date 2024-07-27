@@ -21,16 +21,20 @@
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <button id="downloadPNG" class="btn btn-sm btn-primary">
-                    <i class="bi bi-file-earmark-image"></i> Descargar PNG
+                    <i class="bi bi-file-earmark-image"></i> Descargar en PNG
+                </button>   
+                <button id="downloadPDF" class="btn btn-sm btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Descargar en PDF
                 </button>
+                         
             </div>
         </div>
-        <div class="h2 pb-2 mb-4 text-info text-center border-bottom border-info mt-3 md-3">
+        <div class="h2 pb-2 mb-4 text-center border-bottom border-info mt-3 md-3">
             Estadísticas
         </div>
         <div class="row mt-5">
             <div class="col-md-12 text-center">
-                <h4>Categoría con más registros</h4>
+                <h4 class="categoria-registros">Categoría con más registros</h4>
                 <p class="Textcategoria" id="mostRegisteredCategory"></p>
             </div>
         </div>
@@ -54,10 +58,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
     crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-labels@1.1.0/dist/chartjs-plugin-labels.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
 </body>
 </html>

@@ -4,7 +4,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById('downloadPNG').addEventListener('click', function() {
         downloadPNG();
     });
+
+    document.getElementById('downloadPDF').addEventListener('click', function() {
+        downloadPDF();
+    });
 });
+
+let mostRegisteredCategoryText = '';
 
 function generateCharts() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
@@ -56,7 +62,7 @@ function generateDoughnutChart(chartId, chartLabel, labels, data) {
                         font: {
                             size: 13 
                         },
-                        color: 'green' 
+                        color: 'gray' 
                     }
                 },
                 title: {
@@ -65,12 +71,37 @@ function generateDoughnutChart(chartId, chartLabel, labels, data) {
                     font: {
                         size: 18
                     },
-                    color: 'white'
+                    color: 'gray' 
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItem) {
+                            return tooltipItem[0].label;
+                        },
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw;
+                        }
+                    },
+                    titleColor: 'white',  
+                    bodyColor: 'white'  
                 },
                 labels: {
-                    render: 'value'
+                    render: 'value',
+                    fontColor: 'white' 
                 }
-            }
+            },
+            layout: {
+                padding: {
+                    top: 20,
+                    bottom: 20
+                }
+            },
+            elements: {
+                arc: {
+                    backgroundColor: '#333',
+                }
+            },
+            backgroundColor: '#222', 
         }
     });
 }
@@ -102,18 +133,39 @@ function generateDoughnutChartWithLabel(chartId, chartLabel, labels, data, title
                     font: {
                         size: 18
                     },
-                    color: 'white'
+                    color: 'gray' 
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItem) {
+                            return tooltipItem[0].label;
+                        },
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw;
+                        }
+                    },
+                    titleColor: 'white', 
+                    bodyColor: 'white' 
                 },
                 labels: {
-                    render: 'value'
+                    render: 'value',
+                    fontColor: 'white'
                 }
-            }
+            },
+            layout: {
+                padding: {
+                    top: 20,
+                    bottom: 20
+                }
+            },
+            elements: {
+                arc: {
+                    backgroundColor: '#333',
+                }
+            },
+            backgroundColor: '#222',
         }
     });
-}
-
-function displayMostRegisteredCategory(category, value) {
-    document.getElementById('mostRegisteredCategory').innerText = `${category}: con ${value} registros`;
 }
 
 function maxIndex(arr) {
@@ -122,6 +174,11 @@ function maxIndex(arr) {
 
 function minIndex(arr) {
     return arr.indexOf(Math.min(...arr));
+}
+
+function displayMostRegisteredCategory(category, value) {
+    mostRegisteredCategoryText = `La categoría "${category}" es la que tiene más entradas, con ${value} registros`;
+    document.getElementById('mostRegisteredCategory').innerText = mostRegisteredCategoryText;
 }
 
 function generateColors(count) {
@@ -138,21 +195,51 @@ function formatCurrency(value) {
 }
 
 function downloadPNG() {
-    html2canvas(document.querySelector("#averageSpendingChart"), {
-        onrendered: function(canvas) {
-            saveAs(canvas.toDataURL(), "averageSpendingChart.png");
-        }
+    const chartIds = ['averageSpendingChart', 'mostExpensiveCategoryChart', 'leastExpensiveCategoryChart'];
+
+    chartIds.forEach(chartId => {
+        html2canvas(document.getElementById(chartId)).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `${chartId}.png`;
+            link.click();
+        });
     });
-    html2canvas(document.querySelector("#mostExpensiveCategoryChart"), {
-        onrendered: function(canvas) {
-            saveAs(canvas.toDataURL(), "mostExpensiveCategoryChart.png");
+}
+
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'letter');
+    const chartIds = ['averageSpendingChart', 'mostExpensiveCategoryChart', 'leastExpensiveCategoryChart'];
+    
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 15;
+    const imgWidth = pageWidth - 2 * margin;
+
+    pdf.setFontSize(15);
+    pdf.text('Estadísticas', pageWidth / 2, 10, { align: 'center' });
+    pdf.setFontSize(8);
+    pdf.text(mostRegisteredCategoryText, pageWidth / 2, 20, { align: 'center' });
+
+    let y = 30;
+
+    for (const chartId of chartIds) {
+        const canvas = await html2canvas(document.getElementById(chartId));
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+        if (y + imgHeight > pageHeight) {
+            pdf.addPage();
+            y = margin;
         }
-    });
-    html2canvas(document.querySelector("#leastExpensiveCategoryChart"), {
-        onrendered: function(canvas) {
-            saveAs(canvas.toDataURL(), "leastExpensiveCategoryChart.png");
-        }
-    });
+
+        pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+        y += imgHeight + 10;
+    }
+
+    pdf.save('gráficos_estadísticos.pdf');
 }
 
 function saveAs(uri, filename) {

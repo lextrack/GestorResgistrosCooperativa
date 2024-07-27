@@ -21,13 +21,13 @@ function generateChart() {
 
     var ctx = document.getElementById('categoryChart').getContext('2d');
     categoryChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: labels,
             datasets: [{
                 label: 'Total por cada categoría',
                 data: values,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                backgroundColor: labels.map((_, i) => `hsl(${i * 360 / labels.length}, 70%, 50%)`),
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 2
             }]
@@ -35,31 +35,13 @@ function generateChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: {
-                        font: {
-                            size: 10 
-                        },
-                        color: 'white'
-                    }
-                },
-                y: {
-                    ticks: {
-                        font: {
-                            size: 12 
-                        },
-                        color: 'red'
-                    }
-                }
-            },
             plugins: {
                 legend: {
                     labels: {
                         font: {
-                            size: 13 
+                            size: 12
                         },
-                        color: 'green' 
+                        color: 'green'
                     }
                 }
             }
@@ -69,11 +51,40 @@ function generateChart() {
 
 document.addEventListener('DOMContentLoaded', (event) => {
     generateChart();
+
+    document.getElementById('downloadPDF').addEventListener('click', function() {
+        downloadPDF();
+    });
 });
 
 function downloadChartAsPNG() {
     var link = document.createElement('a');
     link.href = categoryChart.toBase64Image();
-    link.download = 'grafico_categorias.png';
+    link.download = 'gráfico_categorías.png';
     link.click();
+}
+
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'letter');
+    html2canvas(document.getElementById('categoryChart')).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgWidth = 180;
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        pdf.setFontSize(16);
+        pdf.text('Total por categorías', 105, 10, null, null, 'center');
+
+        let y = 20;
+
+        if (y + imgHeight > pageHeight) {
+            pdf.addPage();
+            y = 20; 
+        }
+        pdf.addImage(imgData, 'PNG', 15, y, imgWidth, imgHeight);
+
+        pdf.save('grafico_categorias.pdf');
+    });
 }

@@ -251,34 +251,76 @@ function updateTotal(){
     document.getElementById("total").value = parseInt(cantidad) * precio;
 }
 
-function searchData(){
-    var searchInput = document.getElementById("searchInput").value;
-    var productList = JSON.parse(localStorage.getItem("productList"));
-    var searchedProducts = productList.filter(function(articulo) {
-      return (
-        articulo.articulo.toLowerCase().includes(searchInput.toLowerCase()) ||
-        articulo.proveedor.toLowerCase().includes(searchInput.toLowerCase())
-      );
+//ver si funciona esta wea
+function searchData() {
+    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var productList = JSON.parse(localStorage.getItem("productList")) || [];
+
+    var searchedProducts = productList.filter(function (articulo) {
+        return (
+            articulo.articulo.toLowerCase().includes(searchInput) ||
+            articulo.proveedor.toLowerCase().includes(searchInput)
+        );
     });
+
+    if (searchInput === "") {
+        showData();
+        return;
+    }
+
+    totalPages = Math.ceil(searchedProducts.length / itemsPerPage);
+    currentPage = 1;
+
+    var startIndex = (currentPage - 1) * itemsPerPage;
+    var endIndex = startIndex + itemsPerPage;
+    var displayedProducts = searchedProducts.slice(startIndex, endIndex);
+
     var html = "";
-    searchedProducts.forEach(function(element, index){
-      html += "<tr>";
-      html += "<td>" + element.articulo + "</td>";
-      html += "<td>" + element.cantidad + "</td>";
-      html += "<td>" + formatCurrency(element.precio) + "</td>";
-      html += "<td>" + formatCurrency(element.total) + "</td>";
-      html += "<td>" + element.proveedor + "</td>";
-      html += "<td>" + element.fecha + "</td>";
-      html +=
-        '<td><button onclick="deleteData(' +
-        index +
-        ')" class="btn btn-danger">Borrar</button><button onclick="updateData(' +
-        index +
-        ')" class="btn btn-warning m-1">Editar</button></td>';
-      html += "</tr>";
+    displayedProducts.forEach(function (element, index) {
+        html += "<tr>";
+        html += "<td>" + element.articulo + "</td>";
+        html += "<td>" + element.cantidad + "</td>";
+        html += "<td>" + formatCurrency(element.precio) + "</td>";
+        html += "<td>" + formatCurrency(element.total) + "</td>";
+        html += "<td>" + element.proveedor + "</td>";
+        html += "<td>" + element.fecha + "</td>";
+        html += "<td>" + element.categoria + "</td>";
+        html +=
+            '<td><button onclick="deleteData(' +
+            index +
+            ')" class="btn btn-danger">Borrar</button><button onclick="updateData(' +
+            index +
+            ')" class="btn btn-warning m-1">Editar</button></td>';
+        html += "</tr>";
     });
     document.querySelector("#crudTable tbody").innerHTML = html;
+
+    let paginationHtml = '<button class="btn btn-danger" onclick="changePage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>&lt;</button>';
+    paginationHtml += '<button class="btn btn-danger" onclick="changePage(1)">Primero</button>';
+    if (totalPages > 5) {
+        let startPage = currentPage - 2;
+        let endPage = currentPage + 2;
+        if (startPage < 1) {
+            startPage = 1;
+            endPage = 5;
+        } else if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = totalPages - 4;
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += '<button class="btn btn-danger" onclick="changePage(' + i + ')" ' + (currentPage === i ? 'style="background-color: #7a2640"' : '') + '>' + i + '</button>';
+        }
+    } else {
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += '<button class="btn btn-danger" onclick="changePage(' + i + ')" ' + (currentPage === i ? 'style="background-color: #7a2640"' : '') + '>' + i + '</button>';
+        }
+    }
+    paginationHtml += '<button class="btn btn-danger" onclick="changePage(' + totalPages + ')">Último</button>';
+    paginationHtml += '<button class="btn btn-danger" onclick="changePage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>&gt;</button>';
+
+    document.querySelector("#pagination").innerHTML = paginationHtml;
 }
+
 
 function exportToExcel() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];

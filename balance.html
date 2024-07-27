@@ -12,9 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="icon" href="assets/imgs/icono.ico" />
     <link rel="stylesheet" href="assets/css/main.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.4.0/dist/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.13/dist/jspdf.plugin.autotable.min.js"></script>
     <style>
         .chart-container {
             position: relative;
@@ -30,12 +27,15 @@
                 <a href="index.html" class="btn btn-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
-                <button onclick="downloadChartAsPNG()"" class="btn btn-sm btn-primary">
-                    <i class="bi bi-file-earmark-image"></i> Descargar PNG
+                <button onclick="downloadChartAsPNG()" class="btn btn-sm btn-primary">
+                    <i class="bi bi-file-earmark-image"></i> Descargar en PNG
+                </button>
+                <button id="downloadPDF" class="btn btn-sm btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Descargar en PDF
                 </button>
             </div>
         </div>
-        <div class="h2 pb-2 mb-4 text-info text-center border-bottom border-info mt-3 md-3">
+        <div class="h2 pb-2 mb-4 text-center border-bottom border-info mt-3 md-3">
             Total por categorías
         </div>
         <div class="row">
@@ -43,14 +43,16 @@
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
-        <div class="row mt-3">
-
-        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
     crossorigin="anonymous"></script>
-    <script src="assets/js/grafico.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.4.0/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.13/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.umd.js.map"></script>
+    <script src="assets/js/balance.js"></script>
 </body>
 </html>
