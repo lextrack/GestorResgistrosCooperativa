@@ -2,7 +2,7 @@
 
 Gestor de transacciones es una aplicación web (hecha a medida) diseñada para el registro y gestión de transacciones de una manera eficiente y sencilla.
 
-Puedes revisarlo desde aquí <a href="https://lextrack.github.io/GestorResgistrosJS/" target="_blank">HERE</a>
+Puedes revisarlo desde aquí <a href="https://lextrack.github.io/GestorResgistrosJS/" target="_blank">aquí</a>
 
 ## Descripción
 
