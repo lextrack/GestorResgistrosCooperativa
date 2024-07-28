@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
+//Los gráficos no se hacen, se descargan
 function downloadChartAsPNG() {
     var link = document.createElement('a');
     link.href = categoryChart.toBase64Image();

@@ -10,7 +10,8 @@ function validateForm(){
     var fecha = document.getElementById("fecha").value;
 
     if(articulo == ""){
-        alert("Debes indicar al menos el nombre del artículo");
+        //Ver si hay alguna forma que no sea necesario validar nada y que se puedan llegar a insertar registros vacios
+        alert("Debes indicar el nombre del artículo");
         return false;
     }
     return true;
@@ -37,6 +38,13 @@ function formatInputPrice(input) {
     input.value = formattedValue;
 }
 
+function formatDate(dateString) {
+    if (!dateString || dateString.trim() === '') {
+        return 'Sin fecha';
+    }
+    const [year, month, day] = dateString.split('-');
+    return `${day}-${month}-${year}`;
+}
 
 function showData() {
     var productList;
@@ -46,6 +54,7 @@ function showData() {
         productList = JSON.parse(localStorage.getItem("productList"));
     }
 
+    //Mucho muy importante este orden
     productList.reverse();
 
     totalPages = Math.ceil(productList.length / itemsPerPage);
@@ -64,7 +73,7 @@ function showData() {
         html += "<td>" + formatCurrency(element.precio) + "</td>";
         html += "<td>" + formatCurrency(element.total) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
-        html += "<td>" + element.fecha + "</td>";
+        html += "<td>" + formatDate(element.fecha) + "</td>";
         html += "<td>" + element.categoria + "</td>";
         html +=
             '<td><button onclick="deleteData(' +
@@ -137,6 +146,9 @@ function AddData() {
         } else {
             productList = JSON.parse(localStorage.getItem("productList"));
         }
+
+        //No se si va aquí pero mostrarle al usuario que fue weon y no puso fecha
+        formatDate();
 
         productList.push({
             articulo: articulo,
@@ -226,8 +238,9 @@ function updateData(index){
             document.getElementById("fecha").value = "";
 
             document.getElementById("dropdownCategoria").innerHTML = "Seleccionar Categoría";
-        
+
             document.getElementById("Submit").style.display = "block";
+            //Revisar que el botón no se atasque como al principio del desarrollo
             document.getElementById("Update").style.display = "none";
         }
     }
@@ -240,7 +253,7 @@ function calculateTotalSum() {
     } else {
         productList = JSON.parse(localStorage.getItem("productList"));
     }
-
+    //Revisar si se suma, antes no tomaba los decimales
     var totalSum = productList.reduce((sum, product) => sum + parseFloat(product.total), 0);
     document.getElementById("totalSum").innerText = totalSum.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
 }
@@ -251,7 +264,7 @@ function updateTotal(){
     document.getElementById("total").value = parseInt(cantidad) * precio;
 }
 
-//ver si funciona esta wea
+// Come on, do a flip
 function searchData() {
     var searchInput = document.getElementById("searchInput").value.toLowerCase();
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
@@ -283,7 +296,7 @@ function searchData() {
         html += "<td>" + formatCurrency(element.precio) + "</td>";
         html += "<td>" + formatCurrency(element.total) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
-        html += "<td>" + element.fecha + "</td>";
+        html += "<td>" + formatDate(element.fecha) + "</td>";
         html += "<td>" + element.categoria + "</td>";
         html +=
             '<td><button onclick="deleteData(' +
@@ -295,6 +308,7 @@ function searchData() {
     });
     document.querySelector("#crudTable tbody").innerHTML = html;
 
+    //Aquí y no en HTML, crack?
     let paginationHtml = '<button class="btn btn-danger" onclick="changePage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>&lt;</button>';
     paginationHtml += '<button class="btn btn-danger" onclick="changePage(1)">Primero</button>';
     if (totalPages > 5) {
@@ -321,33 +335,36 @@ function searchData() {
     document.querySelector("#pagination").innerHTML = paginationHtml;
 }
 
-
+//Un software empieza por una planilla Excel y termina en una planilla Excel
 function exportToExcel() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
+
+    productList.forEach(function(product) {
+        if (product.fecha) { 
+            var date = new Date(product.fecha);
+            var day = String(date.getDate()).padStart(2, '0');
+            var month = String(date.getMonth() + 1).padStart(2, '0'); //El mes empieza por 0
+            var year = date.getFullYear();
+            product.fecha = day + '-' + month + '-' + year;
+        }
+    });
 
     var worksheet = XLSX.utils.json_to_sheet(productList);
     var workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DatosTransacciones');
 
     var currentDate = new Date();
-    var dateFormatted = currentDate.toISOString().slice(0,10);
+    var day = String(currentDate.getDate()).padStart(2, '0');
+    var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    var year = currentDate.getFullYear();
+    var dateFormatted = day + '-' + month + '-' + year;
 
     var fileName = 'DatosTransacciones_' + dateFormatted + '.xlsx';
 
     XLSX.writeFile(workbook, fileName);
 }
 
-function importFromJSON(event) {
-    var file = event.target.files[0];
-    var reader = new FileReader();
-    reader.onload = function(event) {
-        var jsonData = JSON.parse(event.target.result);
-        localStorage.setItem("productList", JSON.stringify(jsonData));
-        showData();
-    };
-    reader.readAsText(file);
-}
-
+//Necesario porque no soy capaz de subir esta app a un servidor
 function exportToJSON() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(productList));
@@ -367,4 +384,15 @@ function exportToJSON() {
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+}
+
+function importFromJSON(event) {
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function(event) {
+        var jsonData = JSON.parse(event.target.result);
+        localStorage.setItem("productList", JSON.stringify(jsonData));
+        showData();
+    };
+    reader.readAsText(file);
 }

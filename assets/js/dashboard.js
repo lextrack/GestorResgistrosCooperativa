@@ -207,6 +207,7 @@ function downloadPNG() {
     });
 }
 
+//Imagina si Adobe ni su formato PDF no existira, la vida sería mejor
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'letter');
@@ -218,25 +219,33 @@ async function downloadPDF() {
     const imgWidth = pageWidth - 2 * margin;
 
     pdf.setFontSize(15);
-    pdf.text('Estadísticas', pageWidth / 2, 10, { align: 'center' });
-    pdf.setFontSize(8);
-    pdf.text(mostRegisteredCategoryText, pageWidth / 2, 20, { align: 'center' });
+    pdf.text('Estadísticas', pageWidth / 2, margin / 2, { align: 'center' });
+    
+    if (mostRegisteredCategoryText) {
+        pdf.setFontSize(8);
+        pdf.text(mostRegisteredCategoryText, pageWidth / 2, margin, { align: 'center' });
+    }
 
-    let y = 30;
+    let y = margin + 10;
 
     for (const chartId of chartIds) {
-        const canvas = await html2canvas(document.getElementById(chartId));
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        try {
+            const canvas = await html2canvas(document.getElementById(chartId));
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-        if (y + imgHeight > pageHeight) {
-            pdf.addPage();
-            y = margin;
+            if (y + imgHeight > pageHeight) {
+                pdf.addPage();
+                y = margin;
+            }
+
+            pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+            y += imgHeight + 10;
+        } catch (error) {
+            alert(`Error al generar el canvas para el gráfico ${chartId}: ${error.message}`);
+            return;
         }
-
-        pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-        y += imgHeight + 10;
     }
 
     pdf.save('gráficos_estadísticos.pdf');
