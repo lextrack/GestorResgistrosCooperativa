@@ -37,12 +37,63 @@ function formatInputPrice(input) {
     input.value = formattedValue;
 }
 
-function formatDate(dateString) {
-    if (!dateString || dateString.trim() === '') {
-        return 'Sin duración';
+function mostrarToast(titulo, mensaje, tipo = 'info', duracion = 4000) {
+    const toastEl = document.getElementById('liveToast');
+    
+    toastEl.querySelector('.toast-header strong').textContent = titulo;
+    toastEl.querySelector('.toast-body').textContent = mensaje;
+    
+    toastEl.className = `toast ${tipo}`;
+    
+    const toast = new bootstrap.Toast(toastEl, {
+        delay: duracion,
+        autohide: true
+    });
+    toast.show();
+}
+
+function AddData() {
+    if (validateForm()) {
+        var articulo = document.getElementById("articulo").value;
+        var cantidad = document.getElementById("cantidad").value;
+        var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'));
+        var proveedor = document.getElementById("proveedor").value;
+        var categoria = document.getElementById("categoria").value;
+        var duracion = document.getElementById("duracion").value;
+        var total = parseInt(cantidad) * precio;
+
+        var productList;
+        if (localStorage.getItem("productList") == null) {
+            productList = [];
+        } else {
+            productList = JSON.parse(localStorage.getItem("productList"));
+        }
+
+        productList.push({
+            articulo: articulo,
+            cantidad: cantidad,
+            precio: precio,
+            proveedor: proveedor,
+            categoria: categoria,
+            duracion: duracion,
+            total: total
+        });
+
+        localStorage.setItem("productList", JSON.stringify(productList));
+        showData();
+
+        document.getElementById("articulo").value = "";
+        document.getElementById("cantidad").value = "0";
+        document.getElementById("precio").value = "0";
+        document.getElementById("proveedor").value = "";
+        document.getElementById("categoria").value = "";
+        document.getElementById("duracion").value = "";
+        document.getElementById("total").value = "";
+
+        document.getElementById("dropdownCategoria").innerHTML = "Seleccionar Categoría";
+
+        calculateTotalSum();
     }
-    const [year, month, day] = dateString.split('-');
-    return `${day}-${month}-${year}`;
 }
 
 function showData() {
@@ -71,7 +122,7 @@ function showData() {
         html += "<td>" + formatCurrency(element.precio) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
         html += "<td>" + element.categoria + "</td>";
-        html += "<td>" + formatDate(element.duracion) + "</td>";
+        html += "<td>" + element.duracion + "</td>";
         html += "<td>" + formatCurrency(element.total) + "</td>";
         html +=
             '<td><button onclick="deleteData(' +
@@ -126,52 +177,6 @@ function changePage(newPage) {
         currentPage = newPage;
     }
     showData();
-}
-
-function AddData() {
-    if (validateForm()) {
-        var articulo = document.getElementById("articulo").value;
-        var cantidad = document.getElementById("cantidad").value;
-        var precio = parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'));
-        var proveedor = document.getElementById("proveedor").value;
-        var categoria = document.getElementById("categoria").value;
-        var duracion = document.getElementById("duracion").value;
-        var total = parseInt(cantidad) * precio;
-
-        var productList;
-        if (localStorage.getItem("productList") == null) {
-            productList = [];
-        } else {
-            productList = JSON.parse(localStorage.getItem("productList"));
-        }
-
-        formatDate();
-
-        productList.push({
-            articulo: articulo,
-            cantidad: cantidad,
-            precio: precio,
-            proveedor: proveedor,
-            categoria: categoria,
-            duracion: duracion,
-            total: total
-        });
-
-        localStorage.setItem("productList", JSON.stringify(productList));
-        showData();
-
-        document.getElementById("articulo").value = "";
-        document.getElementById("cantidad").value = "0";
-        document.getElementById("precio").value = "0";
-        document.getElementById("proveedor").value = "";
-        document.getElementById("categoria").value = "";
-        document.getElementById("duracion").value = "";
-        document.getElementById("total").value = "";
-
-        document.getElementById("dropdownCategoria").innerHTML = "Seleccionar Categoría";
-
-        calculateTotalSum();
-    }
 }
 
 function deleteData(index){
@@ -290,7 +295,7 @@ function searchData() {
         html += "<td>" + formatCurrency(element.precio) + "</td>";
         html += "<td>" + element.proveedor + "</td>";
         html += "<td>" + element.categoria + "</td>";
-        html += "<td>" + formatDate(element.duracion) + "</td>";
+        html += "<td>" + element.duracion + "</td>";
         html += "<td>" + formatCurrency(element.total) + "</td>";
         html +=
             '<td><button onclick="deleteData(' +
@@ -332,13 +337,6 @@ function exportToExcel() {
     var productList = JSON.parse(localStorage.getItem("productList")) || [];
 
     productList.forEach(function(product) {
-        if (product.duracion) { 
-            var date = new Date(product.duracion);
-            var day = String(date.getDate()).padStart(2, '0');
-            var month = String(date.getMonth() + 1).padStart(2, '0');
-            var year = date.getFullYear();
-            product.duracion = day + '-' + month + '-' + year;
-        }
     });
 
     var data = [
@@ -384,10 +382,10 @@ function exportToExcel() {
 
     var fileName = 'DatosTransacciones_' + dateFormatted + '.xlsx';
     XLSX.writeFile(wb, fileName);
+    mostrarToast('Éxito', 'La planilla de Excel acaba de ser exportada a la carpeta de Descargas', 'success', 4000);
 }
 
-// Función para generar una fecha con formato
-function getFormattedDate() {
+function getFormattedDateJSON() {
     const currentDate = new Date();
     const day = String(currentDate.getDate()).padStart(2, '0');
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -398,34 +396,33 @@ function getFormattedDate() {
     return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 
-// Función para exportar a JSON
 function exportToJSON() {
     try {
         const productList = JSON.parse(localStorage.getItem("productList")) || [];
         const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(productList))}`;
-        const formattedDate = getFormattedDate();
+        const formattedDate = getFormattedDateJSON();
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", `Respaldo_${formattedDate}.json`);
         document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         document.body.removeChild(downloadAnchorNode);
+        mostrarToast('Éxito', 'El respaldo acaba de ser exportado a la carpeta de Descargas', 'success', 4000);
     } catch (error) {
         console.error("Error al exportar datos:", error);
-        alert("Hubo un error al exportar los datos. Por favor, intenta de nuevo.");
+        mostrarToast('Error', 'Hubo un error al exportar los datos. Por favor, intenta de nuevo.', 'danger', 4000);
     }
 }
 
-// Función para importar desde JSON
 function importFromJSON(event) {
     const file = event.target.files[0];
     if (!file) {
-        alert("Por favor, selecciona un archivo.");
+        mostrarToast('Advertencia', 'Por favor, selecciona un archivo.', 'info', 4000);
         return;
     }
 
     if (file.type !== "application/json") {
-        alert("Por favor, selecciona un archivo JSON.");
+        mostrarToast('Advertencia', 'Por favor, selecciona un archivo JSON.', 'info', 4000);
         return;
     }
 
@@ -434,15 +431,16 @@ function importFromJSON(event) {
         try {
             const jsonData = JSON.parse(event.target.result);
             localStorage.setItem("productList", JSON.stringify(jsonData));
-            showData(); // Asegúrate de que esta función esté definida
+            mostrarToast('Éxito', 'Respaldo cargado con éxito', 'success', 4000);
+            showData();
         } catch (error) {
             console.error("Error al analizar el archivo JSON:", error);
-            alert("El archivo no es un JSON válido. Por favor, selecciona un archivo JSON válido.");
+            mostrarToast('Error', 'El archivo no es un JSON válido. Por favor, selecciona un archivo JSON válido.', 'danger', 4000);
         }
     };
     reader.onerror = function(event) {
         console.error("Error al leer el archivo:", event.target.error);
-        alert("Hubo un error al leer el archivo. Por favor, intenta de nuevo.");
+        mostrarToast('Error', 'Hubo un error al leer el archivo. Por favor, intenta de nuevo.', 'danger', 4000);
     };
     reader.readAsText(file);
 }

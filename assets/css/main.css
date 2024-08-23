@@ -163,3 +163,70 @@ h4.categoria-registros {
     border: none; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
+
+.toast-container {
+    z-index: 1100;
+  }
+  
+  #liveToast {
+    background-color: #343a40;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+  
+  #liveToast .toast-header {
+    background-color: #2c3136;
+    border-bottom: 1px solid #495057;
+    color: #f8f9fa;
+  }
+  
+  #liveToast .toast-header strong {
+    color: #e9ecef;
+  }
+  
+  #liveToast .toast-header small {
+    color: #adb5bd;
+  }
+  
+  #liveToast .btn-close {
+    font-size: 0.875rem;
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+  
+  #liveToast .toast-body {
+    color: #f8f9fa;
+    padding: 12px;
+  }
+
+  .toast.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.toast.danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.toast.info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.toast.success .toast-header {
+    background-color: #c3e6cb;
+    color: #155724;
+}
+
+.toast.danger .toast-header {
+    background-color: #f5c6cb;
+    color: #721c24;
+}
+
+.toast.info .toast-header {
+    background-color: #bee5eb;
+    color: #0c5460;
+}
