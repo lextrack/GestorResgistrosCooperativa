@@ -242,3 +242,68 @@ color: #721c24;
 background-color: #bee5eb;
 color: #0c5460;
 }
+
+/* Dispositivos pequeños (teléfonos, 576px y menos) */
+@media (max-width: 576px) {
+    body {
+        padding: 0 10px;
+    }
+    
+    .container {
+        padding: 5px;
+        border-radius: 5px;
+    }
+    
+    .form-control {
+        padding: 0.5rem;
+        font-size: 14px;
+    }
+    
+    .table th, .table td {
+        padding: 0.5rem;
+        font-size: 12px;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 12px;
+    }
+    
+    .dropdown-menu {
+        width: 100%;
+    }
+    
+    .multi-column-dropdown {
+        column-count: 1;
+    }
+    
+    .total-sum-container {
+        text-align: center;
+        padding: 10px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 95%;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pagination .btn {
+        margin: 2px;
+        padding: 0.3rem 0.6rem;
+    }
+}
