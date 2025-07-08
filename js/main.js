@@ -73,6 +73,7 @@ function initializeDashboardPage() {
 }
 
 function initializeIndexPage() {
+    setDefaultDate();
     showData();
     
     document.getElementById("Submit")?.addEventListener("click", AddData);
@@ -90,6 +91,17 @@ function setupCommonEventListeners() {
     document.getElementById("cantidad")?.addEventListener("input", updateTotal);
 }
 
+function setDefaultDate() {
+    const fechaInput = document.getElementById("fecha");
+    if (fechaInput) {
+        const today = new Date();
+        const formattedDate = today.getFullYear() + '-' + 
+                            String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(today.getDate()).padStart(2, '0');
+        fechaInput.value = formattedDate;
+    }
+}
+
 function AddData() {
     if (validateForm()) {
         const product = {
@@ -97,6 +109,7 @@ function AddData() {
             cantidad: document.getElementById("cantidad").value,
             precio: parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')),
             proveedor: document.getElementById("proveedor").value,
+            fecha: document.getElementById("fecha").value,
             categoria: document.getElementById("categoria").value,
             duracion: document.getElementById("duracion").value,
             total: parseInt(document.getElementById("cantidad").value) * 
@@ -106,6 +119,7 @@ function AddData() {
         addProduct(product);
         showData();
         resetForm();
+        setDefaultDate();
         calculateTotalSum();
         
         if (window.location.pathname.includes('dashboard.html')) {
@@ -116,10 +130,18 @@ function AddData() {
 
 function validateForm() {
     const articulo = document.getElementById("articulo").value;
+    const fecha = document.getElementById("fecha").value;
+    
     if (!articulo) {
         mostrarToast('Error', 'Debes indicar el nombre del artículo', 'danger');
         return false;
     }
+    
+    if (!fecha) {
+        mostrarToast('Error', 'Debes seleccionar una fecha', 'danger');
+        return false;
+    }
+    
     return true;
 }
 
@@ -151,6 +173,7 @@ function renderTable(products, totalLength) {
                 <td>${product.cantidad}</td>
                 <td>${formatCurrency(product.precio)}</td>
                 <td>${product.proveedor}</td>
+                <td>${formatDate(product.fecha)}</td>
                 <td>${product.categoria}</td>
                 <td>${product.duracion}</td>
                 <td>${formatCurrency(product.total)}</td>
@@ -168,6 +191,19 @@ function renderTable(products, totalLength) {
     if (totalSumElement) {
         totalSumElement.innerText = formatCurrency(totalSum);
     }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString + 'T00:00:00');
+    const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+    };
+    
+    return date.toLocaleDateString('es-CL', options);
 }
 
 function changePage(newPage) {
@@ -200,6 +236,7 @@ function updateData(index) {
     document.getElementById("cantidad").value = product.cantidad;
     document.getElementById("precio").value = product.precio;
     document.getElementById("proveedor").value = product.proveedor;
+    document.getElementById("fecha").value = product.fecha || '';
     document.getElementById("categoria").value = product.categoria;
     document.getElementById("duracion").value = product.duracion;
     document.getElementById("total").value = product.total;
@@ -213,6 +250,7 @@ function updateData(index) {
                     cantidad: document.getElementById("cantidad").value,
                     precio: parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')),
                     proveedor: document.getElementById("proveedor").value,
+                    fecha: document.getElementById("fecha").value,
                     categoria: document.getElementById("categoria").value,
                     duracion: document.getElementById("duracion").value,
                     total: parseInt(document.getElementById("cantidad").value) * 
@@ -222,6 +260,7 @@ function updateData(index) {
                 updateProduct(index, updatedProduct);
                 showData();
                 resetForm();
+                setDefaultDate();
                 toggleFormButtons(true);
                 calculateTotalSum();
                 

@@ -1,11 +1,24 @@
 import { formatCurrency } from './currencyFormatter.js';
 import { mostrarToast } from './uiHelpers.js';
 
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString + 'T00:00:00');
+    const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+    };
+    
+    return date.toLocaleDateString('es-CL', options);
+}
+
 export function exportToExcel() {
     const productList = JSON.parse(localStorage.getItem("productList")) || [];
     
     const data = [
-        ["Artículo", "Cantidad", "Precio", "Proveedor", "Categoría", "Duración", "", "Total"]
+        ["Artículo", "Cantidad", "Precio", "Proveedor", "Fecha", "Categoría", "Duración", "Total"]
     ];
 
     productList.forEach(product => {
@@ -14,23 +27,23 @@ export function exportToExcel() {
             product.cantidad,
             formatCurrency(product.precio),
             product.proveedor,
+            formatDate(product.fecha),
             product.categoria,
             product.duracion,
-            "", 
             formatCurrency(product.total)
         ]);
     });
 
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     worksheet["!cols"] = [
-        { width: 35 },
-        { width: 10 },
-        { width: 15 },
-        { width: 20 },
-        { width: 15 },
-        { width: 15 },
-        { width: 20 },
-        { width: 20 }
+        { width: 35 }, // Artículo
+        { width: 10 }, // Cantidad
+        { width: 15 }, // Precio
+        { width: 20 }, // Proveedor
+        { width: 12 }, // Fecha
+        { width: 15 }, // Categoría
+        { width: 15 }, // Duración
+        { width: 20 }  // Total
     ];
 
     worksheet["!cols"][7].alignment = { horizontal: "center", vertical: "center" };

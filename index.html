@@ -40,6 +40,11 @@
                     id="proveedor" placeholder="Ingresa nombre del proveedor">
                 </div>
                 <div class="form-group col-md-6 mb-3">
+                    <label for="name">Fecha</label>
+                    <input type="date" name="fecha" class="form-control" 
+                    id="fecha">
+                </div>
+                <div class="form-group col-md-6 mb-3">
                     <label for="name">Duración</label>
                     <input type="text" name="duracion" class="form-control" 
                     id="duracion">
@@ -53,57 +58,72 @@
                         <ul class="dropdown-menu multi-column-dropdown" aria-labelledby="dropdownCategoria">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Actividades externas')">Actividades externas</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Actividades internas')">Actividades internas</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Agua')">Agua</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Aseo')">Aseo</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Asesoria')">Asesoria</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Asesoria')">Asesoria</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Auditoria')">Auditoria</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('B. permanencia')">B. permanencia</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Beneficio escolar')">Beneficio escolar</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Capacitación')">Capacitación</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Capital humano')">Capital humano</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Comercial')">Comercial</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Computacion')">Computacion</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Convenios')">Convenios</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Dicom')">Dicom</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Diseñador grafico')">Diseñador grafico</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Encomiendas')">Encomiendas</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Equipos computacionales')">Equipos computacionales</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Gastos de materiales y útiles de oficina')">Gastos de materiales y útiles de oficina</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Gastos legales - notariales y asesorias')">Gastos legales - notariales y asesorias</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Guardia de seguridad')">Guardia de seguridad</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Imagen')">Imagen</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Imprenta encuadernacion')">Imprenta encuadernacion</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Informatica y certificados')">Informatica y certificados</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Leyes sociales')">Leyes sociales</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Luz')">Luz</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('REMUNERACIÓN BASE')">REMUNERACIÓN BASE</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('HORAS EXTRAORDINARIAS')">HORAS EXTRAORDINARIAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN DE ZONA')">ASIGNACIÓN DE ZONA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACION DE MOVILIZACION')">ASIGNACION DE MOVILIZACION</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO CASA')">ASIGNACIÓN BONO CASA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN DE CAJA')">ASIGNACIÓN DE CAJA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN DERECHO A TITULO')">ASIGNACIÓN DERECHO A TITULO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO DE RESPONSABILIDAD')">ASIGNACIÓN BONO DE RESPONSABILIDAD</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO DE PRODUCCIÓN EFICIENCIA')">ASIGNACIÓN BONO DE PRODUCCIÓN "EFICIENCIA"</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO ESCOLAR')">ASIGNACIÓN BONO ESCOLAR</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('APORTES PROVISIONALES MUTUAL')">APORTES PROVISIONALES "MUTUAL"</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GRATIFICACIONES')">GRATIFICACIONES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('AGUINALDOS Y OTROS BONOS')">AGUINALDOS Y OTROS BONOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO TRIENIO')">ASIGNACIÓN BONO TRIENIO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('ASIGNACIÓN BONO REEMPLAZO')">ASIGNACIÓN BONO REEMPLAZO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('SEGURO CESANTIA EMPRESA')">SEGURO CESANTIA "EMPRESA"</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('SEGURO DE INVALIDEZ Y SOBREVIVENCIA')">SEGURO DE INVALIDEZ Y SOBREVIVENCIA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('BONO ATENCION DE PUBLICO C MATRIZ')">BONO ATENCION DE PUBLICO "C MATRIZ"</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('DIETAS CONSEJEROS')">DIETAS CONSEJEROS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS MOVILIZACIÓN CONSEJEROS')">GASTOS MOVILIZACIÓN CONSEJEROS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE ATENCIÓN CONSEJEROS')">GASTOS DE ATENCIÓN CONSEJEROS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE ATENCION FUNCIONARIOS')">GASTOS DE ATENCION FUNCIONARIOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS MOVILIZACIÓN DEL PERSONAL')">GASTOS MOVILIZACIÓN DEL PERSONAL</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('VIÁTICOS DIRIGENTES Y/O PERSONAL')">VIÁTICOS "DIRIGENTES Y/O PERSONAL"</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE TRASLADO')">GASTOS DE TRASLADO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('COMISIONES BANCARIAS')">COMISIONES BANCARIAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS POR DEPRECIACIONES A FIJO')">GASTOS POR DEPRECIACIONES A FIJO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('CONTRIBUCIONES Y OTROS GASTOS')">CONTRIBUCIONES Y OTROS GASTOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS FEDERACIÓN')">GASTOS FEDERACIÓN</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS SUBSECRETARIA DE ECONOMIA, FOMENTO Y RECONSTRUCCIÓN')">GASTOS SUBSECRETARIA DE ECONOMIA, FOMENTO Y RECONSTRUCCIÓN</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('SERVICIOS PAGADOS A TERCEROS POR SERV  PRESTADOS A LA COOP')">SERVICIOS PAGADOS A TERCEROS POR SERV  PRESTADOS A LA COOP</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('AYUDA CUOTA MORTUORIA')">AYUDA CUOTA MORTUORIA</a></li>
                                 </div>
                                 <div class="col-sm-6">
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Mantencion y gastos menores de equipos computacionales')">Mantencion y gastos menores de equipos computacionales</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Memorias')">Memorias</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Mensajeria masivo')">Mensajeria masivo</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Monitores')">Monitores</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Muebles y enseres')">Muebles y enseres</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Otros activos fijos')">Otros activos fijos</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Pagina web')">Pagina web</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Proveedores')">Proveedores</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Publicidad')">Publicidad</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Remuneraciones')">Remuneraciones</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Reparaciones menores')">Reparaciones menores</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Seguridad')">Seguridad</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Seguros')">Seguros</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Software')">Software</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Soporte desarrollo erp')">Soporte desarrollo erp</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Telefonia')">Telefonia</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Trabajos varios estructura')">Trabajos varios estructura</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Uniforme')">Uniforme</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Utiles de aseo y oficina')">Utiles de aseo y oficina</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Vacaciones')">Vacaciones</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Viaticos y pasajes')">Viaticos y pasajes</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Wifi - internet')">Wifi - internet</a></li>
-                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('Otro')">Otro</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE CAPACITACIÓN Y PERFECCIONAMIENTO')">GASTOS DE CAPACITACIÓN Y PERFECCIONAMIENTO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS UNIFORMES DEL PERSONAL')">GASTOS UNIFORMES DEL PERSONAL</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('BONO AL PERSONAL DE DISTRIBUCION DE UTILIDADES')">BONO AL PERSONAL DE DISTRIBUCION DE UTILIDADES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE SEGURIDAD Y BIENESTAR DEL TRABAJADOR')">GASTOS DE SEGURIDAD Y BIENESTAR DEL TRABAJADOR</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE MATERIALES Y ÚTILES DE OFICINA')">GASTOS DE MATERIALES Y ÚTILES DE OFICINA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE IMPRESOS Y FORMULARIOS')">GASTOS DE IMPRESOS Y FORMULARIOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('MANTENCION Y GASTOS MENORES DE EQUIPOS COMPUTACIONALES')">MANTENCION Y GASTOS MENORES DE EQUIPOS COMPUTACIONALES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE INFORMATICA Y CERTIFICADOS')">GASTOS DE INFORMATICA Y CERTIFICADOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE ARRIENDOS PAGADOS Y DEVENGADOS')">GASTOS DE ARRIENDOS PAGADOS Y DEVENGADOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE PRIMAS SEGUROS')">GASTOS DE PRIMAS SEGUROS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE PUBLICIDAD Y PROPAGANDA')">GASTOS DE PUBLICIDAD Y PROPAGANDA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE LUZ')">GASTOS DE LUZ</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE AGUA')">GASTOS DE AGUA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE TELÉFONOS')">GASTOS DE TELÉFONOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE UTILES DE ASEO Y LIMPIEZA GNERAL')">GASTOS DE UTILES DE ASEO Y LIMPIEZA GNERAL</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE VALIJAS Y ENCOMIENDAS')">GASTOS DE VALIJAS Y ENCOMIENDAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS LEGALES - NOTARIALES Y ASESORIAS')">GASTOS LEGALES - NOTARIALES Y ASESORIAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE INFORMES COMERCIALES')">GASTOS DE INFORMES COMERCIALES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE ANIVERSARIO')">GASTOS DE ANIVERSARIO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE JUNTA GENERAL')">GASTOS DE JUNTA GENERAL</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE FOTOCOPIAS')">GASTOS DE FOTOCOPIAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS MENORES VARIOS')">GASTOS MENORES VARIOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS X ADMINISTRACION D X L')">GASTOS X ADMINISTRACION D X L</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS SERVICIOS DE ALARMA')">GASTOS SERVICIOS DE ALARMA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE EQUIPOS DE SEGURIDAD Y VIGILANCIA')">GASTOS DE EQUIPOS DE SEGURIDAD Y VIGILANCIA</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS DE AUDITORIA A LOS EEFF Y OTRAS PARTIDAS')">GASTOS DE AUDITORIA A LOS EEFF Y OTRAS PARTIDAS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('MANTENCION DE EDIFICIO')">MANTENCION DE EDIFICIO</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('REPARACIONES MENORES')">REPARACIONES MENORES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS POR MULTAS E INTERESES')">GASTOS POR MULTAS E INTERESES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS POR DONACIONES A INSTITUCIONES')">GASTOS POR DONACIONES A INSTITUCIONES</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTO DE TRASLADO MOVILIZACION Y VARIOS')">GASTO DE TRASLADO MOVILIZACION Y VARIOS</a></li>
+                                    <li><a class="dropdown-item custom-dropdown-item" href="#" onclick="selectCategoria('GASTOS INTERNET DEDICADO - SERV  E MAIL')"> GASTOS INTERNET DEDICADO - SERV  E MAIL</a></li>
                                 </div>
                             </div>
                         </ul>                                                                                      
@@ -170,6 +190,7 @@
                             <th class="titles">Cantidad</th>
                             <th class="titles">Precio</th>
                             <th class="titles">Proveedor</th>
+                            <th class="titles">Fecha</th>
                             <th class="titles">Categoría</th>
                             <th class="titles">Duración</th>
                             <th class="titles">Total</th>

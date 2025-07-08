@@ -18,6 +18,16 @@ export function resetForm() {
     document.getElementById("cantidad").value = "0";
     document.getElementById("precio").value = "0";
     document.getElementById("proveedor").value = "";
+    
+    const fechaInput = document.getElementById("fecha");
+    if (fechaInput) {
+        const today = new Date();
+        const formattedDate = today.getFullYear() + '-' + 
+                            String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(today.getDate()).padStart(2, '0');
+        fechaInput.value = formattedDate;
+    }
+    
     document.getElementById("categoria").value = "";
     document.getElementById("duracion").value = "";
     document.getElementById("total").value = "";
