@@ -45,8 +45,17 @@ export function importFromJSON(event) {
     reader.onload = function(event) {
         try {
             const jsonData = JSON.parse(event.target.result);
-            localStorage.setItem("productList", JSON.stringify(jsonData));
-            mostrarToast('Éxito', 'Respaldo cargado con éxito', 'success', 4000);
+            const existingData = JSON.parse(localStorage.getItem("productList")) || [];
+            const combinedData = [...existingData, ...jsonData];
+            localStorage.setItem("productList", JSON.stringify(combinedData));
+            
+            const importedCount = jsonData.length;
+            mostrarToast('Éxito', `Respaldo cargado con éxito. Se agregaron ${importedCount} productos.`, 'success', 4000);
+            
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+            
             return true;
         } catch (error) {
             console.error("Error al analizar el archivo JSON:", error);

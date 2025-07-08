@@ -283,5 +283,8 @@ window.searchData = searchData;
 window.formatInputPrice = formatInputPrice;
 window.downloadChartAsPNG = downloadChartAsPNG;
 window.downloadSingleChartPDF = downloadSingleChartPDF;
+window.exportToExcel = exportToExcel;
+window.exportToJSON = exportToJSON;
+window.importFromJSON = importFromJSON;
 
 document.addEventListener('DOMContentLoaded', initializePage);
