@@ -6,7 +6,7 @@ Puedes revisarlo desde aquí <a href="https://lextrack.github.io/GestorResgistro
 
 ## Descripción
 
-Este proyecto permite al usuario registrar transacciones con detalles como el nombre del artículo, cantidad, precio, proveedor, duración (fecha) y categoría. Además, ofrece funciones para exportar e importar datos en JSON para crear respaldos, ya que se usa LocalStorage, ver estadísticas y balances, y realizar búsquedas de transacciones.
+Este proyecto permite al usuario registrar transacciones con detalles como el nombre del artículo, cantidad, precio, proveedor, duración (fecha) y categoría. Además, ofrece funciones para exportar e importar datos en JSON para crear respaldos, ya que se usa IndexedDB, ver estadísticas y balances, y realizar búsquedas de transacciones.
 
 ## Características
 

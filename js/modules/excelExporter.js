@@ -1,5 +1,6 @@
 import { formatCurrency } from './currencyFormatter.js';
 import { mostrarToast } from './uiHelpers.js';
+import { exportAllData } from './dataManager.js';
 
 function formatDate(dateString) {
     if (!dateString) return '';
@@ -14,51 +15,66 @@ function formatDate(dateString) {
     return date.toLocaleDateString('es-CL', options);
 }
 
-export function exportToExcel() {
-    const productList = JSON.parse(localStorage.getItem("productList")) || [];
-    
-    const data = [
-        ["Artículo", "Cantidad", "Precio", "Proveedor", "Fecha", "Categoría", "Duración", "Total"]
-    ];
+export async function exportToExcel() {
+    try {
+        const productList = await exportAllData();
+        
+        if (productList.length === 0) {
+            mostrarToast('Advertencia', 'No hay datos para exportar', 'info', 3000);
+            return;
+        }
 
-    productList.forEach(product => {
-        data.push([
-            product.articulo,
-            product.cantidad,
-            formatCurrency(product.precio),
-            product.proveedor,
-            formatDate(product.fecha),
-            product.categoria,
-            product.duracion,
-            formatCurrency(product.total)
-        ]);
-    });
+        const data = [
+            ["Artículo", "Cantidad", "Precio", "Proveedor", "Fecha", "Categoría", "Duración", "Total"]
+        ];
 
-    const worksheet = XLSX.utils.aoa_to_sheet(data);
-    worksheet["!cols"] = [
-        { width: 35 }, // Artículo
-        { width: 10 }, // Cantidad
-        { width: 15 }, // Precio
-        { width: 20 }, // Proveedor
-        { width: 12 }, // Fecha
-        { width: 15 }, // Categoría
-        { width: 15 }, // Duración
-        { width: 20 }  // Total
-    ];
+        productList.forEach(product => {
+            data.push([
+                product.articulo || '',
+                product.cantidad || 0,
+                formatCurrency(product.precio || 0),
+                product.proveedor || '',
+                formatDate(product.fecha),
+                product.categoria || '',
+                product.duracion || '',
+                formatCurrency(product.total || 0)
+            ]);
+        });
 
-    worksheet["!cols"][7].alignment = { horizontal: "center", vertical: "center" };
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
+        
+        worksheet["!cols"] = [
+            { width: 35 }, // Artículo
+            { width: 10 }, // Cantidad
+            { width: 15 }, // Precio
+            { width: 20 }, // Proveedor
+            { width: 12 }, // Fecha
+            { width: 15 }, // Categoría
+            { width: 15 }, // Duración
+            { width: 20 }  // Total
+        ];
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DatosTransacciones");
+        if (worksheet["!cols"][7]) {
+            worksheet["!cols"][7].alignment = { horizontal: "center", vertical: "center" };
+        }
 
-    const currentDate = new Date();
-    const dateFormatted = [
-        String(currentDate.getDate()).padStart(2, '0'),
-        String(currentDate.getMonth() + 1).padStart(2, '0'),
-        currentDate.getFullYear()
-    ].join('-');
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "DatosTransacciones");
 
-    const fileName = `DatosTransacciones_${dateFormatted}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-    mostrarToast('Éxito', 'La planilla de Excel acaba de ser exportada a la carpeta de Descargas', 'success', 4000);
+        const currentDate = new Date();
+        const dateFormatted = [
+            String(currentDate.getDate()).padStart(2, '0'),
+            String(currentDate.getMonth() + 1).padStart(2, '0'),
+            currentDate.getFullYear()
+        ].join('-');
+
+        const fileName = `DatosTransacciones_${dateFormatted}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+        
+        mostrarToast('Éxito', `Se exportaron ${productList.length} registros a Excel. El archivo se guardó en la carpeta de Descargas.`, 'success', 4000);
+        
+    } catch (error) {
+        console.error('Error al exportar a Excel:', error);
+        mostrarToast('Error', 'Hubo un error al exportar los datos a Excel. Por favor, intenta de nuevo.', 'danger', 4000);
+    }
 }

@@ -16,22 +16,22 @@ import { renderPagination, paginateItems } from './modules/pagination.js';
 let currentPage = 1;
 let totalPages = 1;
 
-function initializePage() {
+async function initializePage() {
     const path = window.location.pathname.split('/').pop();
 
     setupCommonEventListeners();
     
     if (path.includes('balance.html')) {
-        initializeBalancePage();
+        await initializeBalancePage();
     } else if (path.includes('dashboard.html')) {
-        initializeDashboardPage();
+        await initializeDashboardPage();
     } else {
-        initializeIndexPage();
+        await initializeIndexPage();
     }
 }
 
-function initializeBalancePage() {
-    generateCategoryChart();
+async function initializeBalancePage() {
+    await generateCategoryChart();
     
     document.getElementById('downloadPNG')?.addEventListener('click', () => {
         downloadChartAsPNG();
@@ -42,8 +42,8 @@ function initializeBalancePage() {
     });
 }
 
-function initializeDashboardPage() {
-    generateDashboardCharts();
+async function initializeDashboardPage() {
+    await generateDashboardCharts();
     
     document.getElementById('downloadPNG')?.addEventListener('click', () => {
         const chartIds = ['averageSpendingChart', 'mostExpensiveCategoryChart', 'leastExpensiveCategoryChart'];
@@ -72,9 +72,9 @@ function initializeDashboardPage() {
     });
 }
 
-function initializeIndexPage() {
+async function initializeIndexPage() {
     setDefaultDate();
-    showData();
+    await showData();
     
     document.getElementById("Submit")?.addEventListener("click", AddData);
     document.getElementById("searchInput")?.addEventListener("input", searchData);
@@ -102,7 +102,7 @@ function setDefaultDate() {
     }
 }
 
-function AddData() {
+async function AddData() {
     if (validateForm()) {
         const product = {
             articulo: document.getElementById("articulo").value,
@@ -116,14 +116,20 @@ function AddData() {
                    parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'))
         };
 
-        addProduct(product);
-        showData();
-        resetForm();
-        setDefaultDate();
-        calculateTotalSum();
-        
-        if (window.location.pathname.includes('dashboard.html')) {
-            generateDashboardCharts();
+        try {
+            await addProduct(product);
+            await showData();
+            resetForm();
+            setDefaultDate();
+            await updateTotalSum();
+            
+            if (window.location.pathname.includes('dashboard.html')) {
+                await generateDashboardCharts();
+            }
+            
+            mostrarToast('Éxito', 'Producto agregado correctamente', 'success');
+        } catch (error) {
+            mostrarToast('Error', 'No se pudo agregar el producto', 'danger');
         }
     }
 }
@@ -145,14 +151,20 @@ function validateForm() {
     return true;
 }
 
-function showData() {
-    const productList = getProductList().reverse();
-    const { displayedItems, totalPages: calculatedPages } = paginateItems(productList, currentPage);
-    totalPages = calculatedPages;
-    
-    renderTable(displayedItems, productList.length);
-    renderPagination(currentPage, totalPages, changePage);
-    calculateTotalSum();
+async function showData() {
+    try {
+        const productList = await getProductList();
+        const reversedList = [...productList].reverse();
+        const { displayedItems, totalPages: calculatedPages } = paginateItems(reversedList, currentPage);
+        totalPages = calculatedPages;
+        
+        renderTable(displayedItems, productList.length);
+        renderPagination(currentPage, totalPages, changePage);
+        await updateTotalSum();
+    } catch (error) {
+        console.error('Error al mostrar datos:', error);
+        mostrarToast('Error', 'No se pudieron cargar los datos', 'danger');
+    }
 }
 
 function renderTable(products, totalLength) {
@@ -206,71 +218,87 @@ function formatDate(dateString) {
     return date.toLocaleDateString('es-CL', options);
 }
 
-function changePage(newPage) {
+async function changePage(newPage) {
     if (newPage < 1) currentPage = 1;
     else if (newPage > totalPages) currentPage = totalPages;
     else currentPage = newPage;
     
-    showData();
+    await showData();
 }
 
-function deleteData(index) {
-    deleteProduct(index);
-    showData();
-    calculateTotalSum();
-    
-    if (window.location.pathname.includes('dashboard.html')) {
-        generateDashboardCharts();
-    } else if (window.location.pathname.includes('balance.html')) {
-        generateCategoryChart();
+async function deleteData(index) {
+    try {
+        await deleteProduct(index);
+        await showData();
+        await updateTotalSum();
+        
+        if (window.location.pathname.includes('dashboard.html')) {
+            await generateDashboardCharts();
+        } else if (window.location.pathname.includes('balance.html')) {
+            await generateCategoryChart();
+        }
+        
+        mostrarToast('Éxito', 'Producto eliminado correctamente', 'success');
+    } catch (error) {
+        mostrarToast('Error', 'No se pudo eliminar el producto', 'danger');
     }
 }
 
-function updateData(index) {
-    toggleFormButtons(false);
-    
-    const productList = getProductList();
-    const product = productList[index];
-    
-    document.getElementById("articulo").value = product.articulo;
-    document.getElementById("cantidad").value = product.cantidad;
-    document.getElementById("precio").value = product.precio;
-    document.getElementById("proveedor").value = product.proveedor;
-    document.getElementById("fecha").value = product.fecha || '';
-    document.getElementById("categoria").value = product.categoria;
-    document.getElementById("duracion").value = product.duracion;
-    document.getElementById("total").value = product.total;
+async function updateData(index) {
+    try {
+        toggleFormButtons(false);
+        
+        const productList = await getProductList();
+        const product = productList[index];
+        
+        document.getElementById("articulo").value = product.articulo;
+        document.getElementById("cantidad").value = product.cantidad;
+        document.getElementById("precio").value = product.precio;
+        document.getElementById("proveedor").value = product.proveedor;
+        document.getElementById("fecha").value = product.fecha || '';
+        document.getElementById("categoria").value = product.categoria;
+        document.getElementById("duracion").value = product.duracion;
+        document.getElementById("total").value = product.total;
 
-    const updateButton = document.querySelector("#Update");
-    if (updateButton) {
-        updateButton.onclick = function() {
-            if (validateForm()) {
-                const updatedProduct = {
-                    articulo: document.getElementById("articulo").value,
-                    cantidad: document.getElementById("cantidad").value,
-                    precio: parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')),
-                    proveedor: document.getElementById("proveedor").value,
-                    fecha: document.getElementById("fecha").value,
-                    categoria: document.getElementById("categoria").value,
-                    duracion: document.getElementById("duracion").value,
-                    total: parseInt(document.getElementById("cantidad").value) * 
-                           parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'))
-                };
+        const updateButton = document.querySelector("#Update");
+        if (updateButton) {
+            updateButton.onclick = async function() {
+                if (validateForm()) {
+                    const updatedProduct = {
+                        articulo: document.getElementById("articulo").value,
+                        cantidad: document.getElementById("cantidad").value,
+                        precio: parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.')),
+                        proveedor: document.getElementById("proveedor").value,
+                        fecha: document.getElementById("fecha").value,
+                        categoria: document.getElementById("categoria").value,
+                        duracion: document.getElementById("duracion").value,
+                        total: parseInt(document.getElementById("cantidad").value) * 
+                               parseFloat(document.getElementById("precio").value.replace(/\./g, '').replace(',', '.'))
+                    };
 
-                updateProduct(index, updatedProduct);
-                showData();
-                resetForm();
-                setDefaultDate();
-                toggleFormButtons(true);
-                calculateTotalSum();
-                
-                if (window.location.pathname.includes('dashboard.html')) {
-                    generateDashboardCharts();
-                } else if (window.location.pathname.includes('balance.html')) {
-                    generateCategoryChart();
+                    try {
+                        await updateProduct(index, updatedProduct);
+                        await showData();
+                        resetForm();
+                        setDefaultDate();
+                        toggleFormButtons(true);
+                        await updateTotalSum();
+                        
+                        if (window.location.pathname.includes('dashboard.html')) {
+                            await generateDashboardCharts();
+                        } else if (window.location.pathname.includes('balance.html')) {
+                            await generateCategoryChart();
+                        }
+                        
+                        mostrarToast('Éxito', 'Producto actualizado correctamente', 'success');
+                    } catch (error) {
+                        mostrarToast('Error', 'No se pudo actualizar el producto', 'danger');
+                    }
                 }
-            }
-        };
+            };
+        }
+    } catch (error) {
+        mostrarToast('Error', 'No se pudo cargar el producto para editar', 'danger');
     }
 }
 
@@ -287,20 +315,36 @@ function updateTotal() {
     }
 }
 
-function searchData() {
+async function updateTotalSum() {
+    try {
+        const total = await calculateTotalSum();
+        const totalSumElement = document.getElementById("totalSum");
+        if (totalSumElement) {
+            totalSumElement.innerText = formatCurrency(total);
+        }
+    } catch (error) {
+        console.error('Error al actualizar suma total:', error);
+    }
+}
+
+async function searchData() {
     const searchInput = document.getElementById("searchInput")?.value.toLowerCase();
     
     if (!searchInput) {
-        showData();
+        await showData();
         return;
     }
 
-    const searchedProducts = searchProducts(searchInput);
-    const { displayedItems, totalPages: calculatedPages } = paginateItems(searchedProducts, 1);
-    totalPages = calculatedPages;
-    
-    renderTable(displayedItems, searchedProducts.length);
-    renderPagination(1, totalPages, changePage);
+    try {
+        const searchedProducts = await searchProducts(searchInput);
+        const { displayedItems, totalPages: calculatedPages } = paginateItems(searchedProducts, 1);
+        totalPages = calculatedPages;
+        
+        renderTable(displayedItems, searchedProducts.length);
+        renderPagination(1, totalPages, changePage);
+    } catch (error) {
+        mostrarToast('Error', 'Error al buscar productos', 'danger');
+    }
 }
 
 window.selectCategoria = function(categoria) {
@@ -313,11 +357,6 @@ window.AddData = AddData;
 window.deleteData = deleteData;
 window.updateData = updateData;
 window.changePage = changePage;
-window.selectCategoria = function(categoria) {
-    document.getElementById("categoria").value = categoria;
-    const dropdown = document.getElementById("dropdownCategoria");
-    if (dropdown) dropdown.innerHTML = categoria;
-};
 window.searchData = searchData;
 window.formatInputPrice = formatInputPrice;
 window.downloadChartAsPNG = downloadChartAsPNG;
