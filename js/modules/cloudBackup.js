@@ -238,30 +238,61 @@ export async function checkCloudConnection() {
 
 export async function cleanupOldBackups(daysToKeep = 90) {
     try {
+        const latestQuery = query(
+            collection(db, 'backups'),
+            orderBy('timestamp', 'desc'),
+            limit(1)
+        );
+        
+        const latestSnapshot = await getDocs(latestQuery);
+        if (latestSnapshot.empty) {
+            console.log('📭 No hay respaldos para limpiar');
+            return { deleted: 0, reason: 'No hay respaldos' };
+        }
+        
+        const latestBackup = latestSnapshot.docs[0];
+        const latestTimestamp = latestBackup.data().timestamp;
+        
+        console.log(`🛡️ RESPALDO MÁS RECIENTE PROTEGIDO: ${new Date(latestTimestamp).toLocaleString('es-CL')}`);
+        
         const cutoffDate = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
         
-        const q = query(
+        const oldBackupsQuery = query(
             collection(db, 'backups'),
-            where('timestamp', '<', cutoffDate),
+            where('timestamp', '<', Math.min(cutoffDate, latestTimestamp)),
             orderBy('timestamp', 'asc'),
             limit(10)
         );
         
-        const snapshot = await getDocs(q);
-        const batch = writeBatch(db);
+        const oldSnapshot = await getDocs(oldBackupsQuery);
+    
+        const toDelete = oldSnapshot.docs.filter(doc => 
+            doc.id !== latestBackup.id && 
+            doc.data().timestamp < cutoffDate 
+        );
         
-        snapshot.docs.forEach(doc => {
+        if (toDelete.length === 0) {
+            console.log('ℹ️ No hay respaldos antiguos seguros para eliminar');
+            return { deleted: 0, reason: 'No hay respaldos antiguos seguros' };
+        }
+        
+        const batch = writeBatch(db);
+        toDelete.forEach(doc => {
+            console.log(`🗑️ Eliminando: ${new Date(doc.data().timestamp).toLocaleString('es-CL')}`);
             batch.delete(doc.ref);
         });
         
-        if (snapshot.docs.length > 0) {
-            await batch.commit();
-            console.log(`🗑️ Eliminados ${snapshot.docs.length} respaldos antiguos`);
-        }
+        await batch.commit();
         
-        return { deleted: snapshot.docs.length };
+        console.log(`✅ Eliminados ${toDelete.length} respaldos. El más reciente está protegido.`);
+        
+        return { 
+            deleted: toDelete.length,
+            latestBackupProtected: new Date(latestTimestamp).toLocaleString('es-CL')
+        };
+        
     } catch (error) {
-        console.error('Error al limpiar respaldos:', error);
+        console.error('❌ Error en limpieza segura:', error);
         throw error;
     }
 }
