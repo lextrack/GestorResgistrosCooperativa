@@ -13,6 +13,12 @@ import { exportToJSON, importFromJSON } from './modules/jsonHandler.js';
 import { mostrarToast, resetForm, toggleFormButtons } from './modules/uiHelpers.js';
 import { renderPagination, paginateItems } from './modules/pagination.js';
 
+import { 
+    createCloudBackup, 
+    getLastCloudBackup, 
+    restoreCloudBackup 
+} from './modules/cloudBackup.js';
+
 let currentPage = 1;
 let totalPages = 1;
 
@@ -81,6 +87,18 @@ async function initializeIndexPage() {
     document.getElementById("exportExcel")?.addEventListener("click", exportToExcel);
     document.getElementById("exportJSON")?.addEventListener("click", exportToJSON);
     document.getElementById("importJSON")?.addEventListener("change", importFromJSON);
+    
+    setupModalEventListeners();
+}
+
+function setupModalEventListeners() {
+    document.getElementById('confirmCreateBackup')?.addEventListener('click', async () => {
+        await executeCreateBackup();
+    });
+
+    document.getElementById('confirmRestoreBackup')?.addEventListener('click', async () => {
+        await executeRestoreBackup();
+    });
 }
 
 function setupCommonEventListeners() {
@@ -347,6 +365,161 @@ async function searchData() {
     }
 }
 
+async function createBackupCloud() {
+    try {
+        const productList = await getProductList();
+        const recordCount = productList.length;
+        
+        if (recordCount === 0) {
+            showResultModal('Sin Datos', 'No hay registros para respaldar.', 'warning');
+            return;
+        }
+
+        document.getElementById('currentRecordCount').textContent = 
+            `Se respaldarán ${recordCount} registros en la nube.`;
+        
+        const modal = new bootstrap.Modal(document.getElementById('createBackupModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error al preparar respaldo:', error);
+        showResultModal('Error', 'No se pudo preparar el respaldo: ' + error.message, 'danger');
+    }
+}
+
+async function executeCreateBackup() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('createBackupModal'));
+    const contentDiv = document.getElementById('createBackupContent');
+    const progressDiv = document.getElementById('createBackupProgress');
+    const confirmButton = document.getElementById('confirmCreateBackup');
+    
+    try {
+        contentDiv.style.display = 'none';
+        progressDiv.style.display = 'block';
+        confirmButton.disabled = true;
+        const result = await createCloudBackup();
+        
+        if (result.success) {
+            modal.hide();
+            showResultModal(
+                'Respaldo Exitoso',
+                `Se creó un respaldo en la nube con ${result.recordCount} registros.`,
+                'success'
+            );
+        }
+        
+    } catch (error) {
+        console.error('Error al crear respaldo:', error);
+        modal.hide();
+        showResultModal('Error', 'No se pudo crear el respaldo: ' + error.message, 'danger');
+    } finally {
+        contentDiv.style.display = 'block';
+        progressDiv.style.display = 'none';
+        confirmButton.disabled = false;
+    }
+}
+
+async function restoreLastBackup() {
+    try {
+        const lastBackup = await getLastCloudBackup();
+        
+        if (!lastBackup) {
+            showResultModal('Sin Respaldos', 'No hay respaldos disponibles en la nube.', 'info');
+            return;
+        }
+
+        document.getElementById('backupInfo').innerHTML = `
+            <div class="backup-status success">
+                <i class="bi bi-cloud-check"></i>
+                <strong>Último respaldo encontrado:</strong><br>
+                📅 Fecha: ${lastBackup.date}<br>
+                📊 Registros: ${lastBackup.recordCount}
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('restoreBackupModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error al obtener información del respaldo:', error);
+        showResultModal('Error', 'No se pudo obtener información del respaldo: ' + error.message, 'danger');
+    }
+}
+
+async function executeRestoreBackup() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('restoreBackupModal'));
+    const contentDiv = document.getElementById('restoreBackupContent');
+    const progressDiv = document.getElementById('restoreBackupProgress');
+    const confirmButton = document.getElementById('confirmRestoreBackup');
+    
+    try {
+        const lastBackup = await getLastCloudBackup();
+        
+        if (!lastBackup) {
+            modal.hide();
+            showResultModal('Error', 'No se encontró el respaldo a restaurar.', 'danger');
+            return;
+        }
+
+        contentDiv.style.display = 'none';
+        progressDiv.style.display = 'block';
+        confirmButton.disabled = true;
+        
+        const result = await restoreCloudBackup(lastBackup.id);
+        
+        if (result.success) {
+            modal.hide();
+            showResultModal(
+                'Restauración Exitosa',
+                `Se restauraron ${result.recordCount} registros del ${result.backupDate}. La página se recargará automáticamente cuando se terminen de cargar los datos.`,
+                'success'
+            );
+            
+            setTimeout(() => location.reload(), 3000);
+        }
+        
+    } catch (error) {
+        console.error('Error al restaurar respaldo:', error);
+        modal.hide();
+        showResultModal('Error', 'No se pudo restaurar el respaldo: ' + error.message, 'danger');
+    } finally {
+        contentDiv.style.display = 'block';
+        progressDiv.style.display = 'none';
+        confirmButton.disabled = false;
+    }
+}
+
+function showResultModal(title, message, type = 'info') {
+    const modal = document.getElementById('resultModal');
+    const modalTitle = document.getElementById('resultModalLabel');
+    const modalBody = document.getElementById('resultModalBody');
+    
+    let icon, colorClass;
+    switch(type) {
+        case 'success':
+            icon = 'bi-check-circle';
+            colorClass = 'text-success';
+            break;
+        case 'danger':
+            icon = 'bi-exclamation-triangle';
+            colorClass = 'text-danger';
+            break;
+        case 'warning':
+            icon = 'bi-exclamation-triangle';
+            colorClass = 'text-warning';
+            break;
+        default:
+            icon = 'bi-info-circle';
+            colorClass = 'text-info';
+    }
+    
+    modalTitle.innerHTML = `<i class="bi ${icon} ${colorClass}"></i> ${title}`;
+    modalBody.innerHTML = `<div class="backup-status ${type}"><i class="bi ${icon}"></i> ${message}</div>`;
+    
+    const resultModal = new bootstrap.Modal(modal);
+    resultModal.show();
+}
+
 window.selectCategoria = function(categoria) {
     document.getElementById("categoria").value = categoria;
     const dropdown = document.getElementById("dropdownCategoria");
@@ -364,5 +537,7 @@ window.downloadSingleChartPDF = downloadSingleChartPDF;
 window.exportToExcel = exportToExcel;
 window.exportToJSON = exportToJSON;
 window.importFromJSON = importFromJSON;
+window.createBackupCloud = createBackupCloud;
+window.restoreLastBackup = restoreLastBackup;
 
 document.addEventListener('DOMContentLoaded', initializePage);

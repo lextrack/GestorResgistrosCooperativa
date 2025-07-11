@@ -1,0 +1,33 @@
+.loading-spinner {
+    display: none;
+}
+.loading-spinner.show {
+    display: inline-block;
+}
+.modal-content {
+    background-color: #262425;
+    border: 1px solid #6c757d;
+}
+.modal-header {
+    border-bottom: 1px solid #495057;
+}
+.modal-footer {
+    border-top: 1px solid #495057;
+}
+.backup-status {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+.backup-status.success {
+    background-color: rgba(25, 135, 84, 0.2);
+    border: 1px solid #198754;
+}
+.backup-status.warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    border: 1px solid #ffc107;
+}
+.backup-status.info {
+    background-color: rgba(13, 202, 240, 0.2);
+    border: 1px solid #0dcaf0;
+}
