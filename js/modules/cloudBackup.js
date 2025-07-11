@@ -56,24 +56,46 @@ export async function createCloudBackup() {
 
         const now = Date.now();
         const dataString = JSON.stringify(cleanedData);
+        const originalSize = dataString.length;
         
-        const shouldCompress = dataString.length > 50000;
+        const shouldCompress = originalSize > 50000;
+        
+        let finalData = null;
+        let compressedData = null;
+        let compressedSize = 0;
+        
+        if (shouldCompress) {
+            compressedData = LZString.compress(dataString);
+            compressedSize = compressedData.length;
+            console.log(`📦 Compresión: ${originalSize} → ${compressedSize} bytes (${Math.round((1 - compressedSize/originalSize) * 100)}% reducción)`);
+        } else {
+            finalData = cleanedData;
+            console.log(`📄 Sin compresión: ${originalSize} bytes`);
+        }
         
         const backupDoc = {
-            data: shouldCompress ? null : cleanedData,
-            compressedData: shouldCompress ? dataString : null,
+            data: finalData,
+    
+            compressedData: compressedData,
+            
             isCompressed: shouldCompress,
+            originalSize: originalSize,
+            compressedSize: shouldCompress ? compressedSize : originalSize,
+            compressionRatio: shouldCompress ? Math.round((1 - compressedSize/originalSize) * 100) : 0,
+            
             timestamp: now,
             recordCount: cleanedData.length,
-            version: '1.1',
+            version: '1.2',
             date: new Date().toISOString(),
             lastUpdate: now,
             checksum: generateSimpleChecksum(cleanedData)
         };
 
         const docSize = JSON.stringify(backupDoc).length;
+        console.log(`📊 Tamaño final del documento: ${Math.round(docSize / 1024)} KB`);
+        
         if (docSize > 950000) { 
-            throw new Error('El respaldo es demasiado grande. Borra algunos registros y vuelve a intentar.');
+            throw new Error(`El respaldo es demasiado grande (${Math.round(docSize / 1024)} KB). Máximo permitido: 950 KB.`);
         }
 
         const docRef = await addDoc(collection(db, 'backups'), backupDoc);
@@ -83,7 +105,10 @@ export async function createCloudBackup() {
             backupId: docRef.id,
             recordCount: cleanedData.length,
             date: new Date().toLocaleString('es-CL'),
-            size: `${Math.round(docSize / 1024)} KB`
+            size: `${Math.round(docSize / 1024)} KB`,
+            originalSize: `${Math.round(originalSize / 1024)} KB`,
+            compressed: shouldCompress,
+            compressionSavings: shouldCompress ? `${Math.round((1 - compressedSize/originalSize) * 100)}%` : 'N/A'
         };
 
     } catch (error) {
@@ -125,7 +150,11 @@ export async function getLastCloudBackup() {
             date: new Date(data.timestamp).toLocaleString('es-CL'),
             recordCount: data.recordCount,
             timestamp: data.timestamp,
-            version: data.version || '1.0'
+            version: data.version || '1.0',
+            isCompressed: data.isCompressed || false,
+            originalSize: data.originalSize ? `${Math.round(data.originalSize / 1024)} KB` : 'N/A',
+            compressedSize: data.compressedSize ? `${Math.round(data.compressedSize / 1024)} KB` : 'N/A',
+            compressionRatio: data.compressionRatio || 0
         };
         
     } catch (error) {
@@ -146,14 +175,37 @@ export async function restoreCloudBackup(backupId) {
         }
         
         const backupData = docSnapshot.data();
-        
         let dataToRestore;
+        
         if (backupData.isCompressed && backupData.compressedData) {
-            dataToRestore = JSON.parse(backupData.compressedData);
+            console.log('🗜️ Descomprimiendo datos...');
+            const decompressedString = LZString.decompress(backupData.compressedData);
+            
+            if (!decompressedString) {
+                throw new Error('Error al descomprimir los datos del respaldo');
+            }
+            
+            try {
+                dataToRestore = JSON.parse(decompressedString);
+                console.log(`✅ Datos descomprimidos: ${dataToRestore.length} registros`);
+            } catch (parseError) {
+                throw new Error('Error al procesar los datos descomprimidos');
+            }
+            
         } else if (backupData.data && Array.isArray(backupData.data)) {
             dataToRestore = backupData.data;
+            console.log(`📄 Datos sin comprimir: ${dataToRestore.length} registros`);
         } else {
             throw new Error('El respaldo no contiene datos válidos');
+        }
+
+        if (backupData.checksum) {
+            const calculatedChecksum = generateSimpleChecksum(dataToRestore);
+            if (calculatedChecksum !== backupData.checksum) {
+                console.warn('⚠️ Advertencia: El checksum no coincide, pero continuando...');
+            } else {
+                console.log('✅ Checksum verificado correctamente');
+            }
         }
 
         await clearAllData();
@@ -163,7 +215,8 @@ export async function restoreCloudBackup(backupId) {
             success: true,
             recordCount: backupData.recordCount,
             backupDate: new Date(backupData.timestamp).toLocaleString('es-CL'),
-            version: backupData.version || '1.0'
+            version: backupData.version || '1.0',
+            wasCompressed: backupData.isCompressed || false
         };
         
     } catch (error) {
@@ -203,7 +256,7 @@ export async function cleanupOldBackups(daysToKeep = 90) {
         
         if (snapshot.docs.length > 0) {
             await batch.commit();
-            console.log(`Eliminados ${snapshot.docs.length} respaldos antiguos`);
+            console.log(`🗑️ Eliminados ${snapshot.docs.length} respaldos antiguos`);
         }
         
         return { deleted: snapshot.docs.length };
@@ -224,6 +277,10 @@ export async function getBackupStats() {
         const snapshot = await getDocs(q);
         const backups = snapshot.docs.map(doc => doc.data());
         
+        const totalOriginalSize = backups.reduce((sum, b) => sum + (b.originalSize || 0), 0);
+        const totalCompressedSize = backups.reduce((sum, b) => sum + (b.compressedSize || b.originalSize || 0), 0);
+        const compressionSavings = totalOriginalSize > 0 ? Math.round((1 - totalCompressedSize/totalOriginalSize) * 100) : 0;
+        
         return {
             totalBackups: backups.length,
             latestBackup: backups[0]?.date || 'Nunca',
@@ -231,7 +288,11 @@ export async function getBackupStats() {
             averageSize: backups.length > 0 
                 ? Math.round(backups.reduce((sum, b) => sum + (b.recordCount || 0), 0) / backups.length)
                 : 0,
-            oldestBackup: backups[backups.length - 1]?.date || 'Nunca'
+            oldestBackup: backups[backups.length - 1]?.date || 'Nunca',
+            compressedBackups: backups.filter(b => b.isCompressed).length,
+            totalSpaceSaved: compressionSavings > 0 ? `${compressionSavings}%` : 'N/A',
+            totalOriginalSize: `${Math.round(totalOriginalSize / 1024)} KB`,
+            totalCompressedSize: `${Math.round(totalCompressedSize / 1024)} KB`
         };
     } catch (error) {
         console.error('Error al obtener estadísticas:', error);

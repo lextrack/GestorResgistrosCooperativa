@@ -388,15 +388,18 @@ async function createBackupCloud() {
         try {
             const stats = await getBackupStats();
             document.getElementById('currentRecordCount').innerHTML = `
-                <strong>Registros a respaldar:</strong> ${recordCount}<br>
-                <strong>Respaldos existentes:</strong> ${stats?.totalBackups || 0}<br>
-                <strong>Último respaldo:</strong> ${stats?.latestBackup || 'Nunca'}
+                <div class="backup-info">
+                    <strong>📊 Registros a respaldar:</strong> ${recordCount}<br>
+                    <strong>☁️ Respaldos existentes:</strong> ${stats?.totalBackups || 0}<br>
+                    <strong>🗜️ Respaldos comprimidos:</strong> ${stats?.compressedBackups || 0}<br>
+                    <strong>📅 Último respaldo:</strong> ${stats?.latestBackup || 'Nunca'}<br>
+                    ${stats?.totalSpaceSaved !== 'N/A' ? `<strong>💾 Espacio ahorrado:</strong> ${stats.totalSpaceSaved}<br>` : ''}
+                </div>
             `;
         } catch (statsError) {
-
             console.warn('No se pudieron obtener estadísticas:', statsError);
             document.getElementById('currentRecordCount').innerHTML = `
-                <strong>Registros a respaldar:</strong> ${recordCount}<br>
+                <strong>📊 Registros a respaldar:</strong> ${recordCount}<br>
                 <em>Cargando información de respaldos...</em>
             `;
         }
@@ -409,7 +412,6 @@ async function createBackupCloud() {
         showResultModal('Error', 'No se pudo preparar el respaldo: ' + error.message, 'danger');
     }
 }
-
 
 async function executeCreateBackup() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('createBackupModal'));
@@ -426,11 +428,15 @@ async function executeCreateBackup() {
         
         if (result.success) {
             modal.hide();
-            showResultModal(
-                'Respaldo Exitoso',
-                `Se creó un respaldo en la nube con ${result.recordCount} registros (${result.size}).`,
-                'success'
-            );
+            
+            let message = `Se creó un respaldo en la nube con ${result.recordCount} registros.<br>`;
+            message += `<strong>Tamaño final:</strong> ${result.size}`;
+            
+            if (result.compressed) {
+                message += `<br><strong>🗜️ Comprimido:</strong> ${result.originalSize} → ${result.size} (${result.compressionSavings} menos)`;
+            }
+            
+            showResultModal('Respaldo Exitoso', message, 'success');
         }
         
     } catch (error) {
@@ -453,14 +459,26 @@ async function restoreLastBackup() {
             return;
         }
 
-        document.getElementById('backupInfo').innerHTML = `
+        let backupInfo = `
             <div class="backup-status success">
                 <i class="bi bi-cloud-check"></i>
-                <strong>Último respaldo:</strong><br>
-                📅 Fecha: ${lastBackup.date}<br>
-                📊 Registros: ${lastBackup.recordCount}
+                <strong>Último respaldo encontrado:</strong><br>
+                📅 <strong>Fecha:</strong> ${lastBackup.date}<br>
+                📊 <strong>Registros:</strong> ${lastBackup.recordCount}<br>
+                📦 <strong>Versión:</strong> ${lastBackup.version}
+        `;
+        
+        if (lastBackup.isCompressed) {
+            backupInfo += `<br>🗜️ <strong>Comprimido:</strong> ${lastBackup.originalSize} → ${lastBackup.compressedSize} (${lastBackup.compressionRatio}% menos)`;
+        } else {
+            backupInfo += `<br>📄 <strong>Sin comprimir:</strong> ${lastBackup.originalSize || 'N/A'}`;
+        }
+        
+        backupInfo += `
             </div>
         `;
+
+        document.getElementById('backupInfo').innerHTML = backupInfo;
         
         const modal = new bootstrap.Modal(document.getElementById('restoreBackupModal'));
         modal.show();
@@ -494,11 +512,14 @@ async function executeRestoreBackup() {
         
         if (result.success) {
             modal.hide();
-            showResultModal(
-                'Restauración Exitosa',
-                `Se restauraron ${result.recordCount} registros del ${result.backupDate}. La página se recargará automáticamente cuando se terminen de cargar los datos.`,
-                'success'
-            );
+            
+            let message = `Se restauraron ${result.recordCount} registros del ${result.backupDate}.`;
+            if (result.wasCompressed) {
+                message += `<br>🗜️ <em>Los datos fueron descomprimidos automáticamente.</em>`;
+            }
+            message += `<br><br>La página se recargará automáticamente.`;
+            
+            showResultModal('Restauración Exitosa', message, 'success');
             
             setTimeout(() => location.reload(), 3000);
         }
