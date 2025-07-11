@@ -16,7 +16,10 @@ import { renderPagination, paginateItems } from './modules/pagination.js';
 import { 
     createCloudBackup, 
     getLastCloudBackup, 
-    restoreCloudBackup 
+    restoreCloudBackup,
+    getBackupStats,
+    cleanupOldBackups,
+    checkCloudConnection
 } from './modules/cloudBackup.js';
 
 let currentPage = 1;
@@ -375,8 +378,28 @@ async function createBackupCloud() {
             return;
         }
 
-        document.getElementById('currentRecordCount').textContent = 
-            `Se respaldarán ${recordCount} registros en la nube.`;
+        if (recordCount > 10000) {
+            showResultModal('Demasiados Datos', 
+                `Tienes ${recordCount} registros, pero el máximo permitido es 10,000. 
+                Considera limpiar datos antiguos primero.`, 'warning');
+            return;
+        }
+
+        try {
+            const stats = await getBackupStats();
+            document.getElementById('currentRecordCount').innerHTML = `
+                <strong>Registros a respaldar:</strong> ${recordCount}<br>
+                <strong>Respaldos existentes:</strong> ${stats?.totalBackups || 0}<br>
+                <strong>Último respaldo:</strong> ${stats?.latestBackup || 'Nunca'}
+            `;
+        } catch (statsError) {
+
+            console.warn('No se pudieron obtener estadísticas:', statsError);
+            document.getElementById('currentRecordCount').innerHTML = `
+                <strong>Registros a respaldar:</strong> ${recordCount}<br>
+                <em>Cargando información de respaldos...</em>
+            `;
+        }
         
         const modal = new bootstrap.Modal(document.getElementById('createBackupModal'));
         modal.show();
@@ -386,6 +409,7 @@ async function createBackupCloud() {
         showResultModal('Error', 'No se pudo preparar el respaldo: ' + error.message, 'danger');
     }
 }
+
 
 async function executeCreateBackup() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('createBackupModal'));
@@ -397,13 +421,14 @@ async function executeCreateBackup() {
         contentDiv.style.display = 'none';
         progressDiv.style.display = 'block';
         confirmButton.disabled = true;
+        
         const result = await createCloudBackup();
         
         if (result.success) {
             modal.hide();
             showResultModal(
                 'Respaldo Exitoso',
-                `Se creó un respaldo en la nube con ${result.recordCount} registros.`,
+                `Se creó un respaldo en la nube con ${result.recordCount} registros (${result.size}).`,
                 'success'
             );
         }
@@ -431,7 +456,7 @@ async function restoreLastBackup() {
         document.getElementById('backupInfo').innerHTML = `
             <div class="backup-status success">
                 <i class="bi bi-cloud-check"></i>
-                <strong>Último respaldo encontrado:</strong><br>
+                <strong>Último respaldo:</strong><br>
                 📅 Fecha: ${lastBackup.date}<br>
                 📊 Registros: ${lastBackup.recordCount}
             </div>

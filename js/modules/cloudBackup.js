@@ -8,7 +8,9 @@ import {
     query, 
     limit,
     doc,
-    getDoc
+    getDoc,
+    where,
+    writeBatch
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -23,6 +25,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+function generateSimpleChecksum(data) {
+    const str = JSON.stringify(data);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; 
+    }
+    return Math.abs(hash).toString(16);
+}
 
 export async function createCloudBackup() {
     try {
@@ -33,18 +45,36 @@ export async function createCloudBackup() {
             throw new Error('No hay datos para respaldar');
         }
 
+        if (localData.length > 10000) {
+            throw new Error('Demasiados registros. Máximo permitido: 10,000');
+        }
+
         const cleanedData = localData.map(product => {
             const { id, timestamp, ...cleanProduct } = product;
             return cleanProduct;
         });
 
+        const now = Date.now();
+        const dataString = JSON.stringify(cleanedData);
+        
+        const shouldCompress = dataString.length > 50000;
+        
         const backupDoc = {
-            data: cleanedData,
-            timestamp: Date.now(),
-            date: new Date().toISOString(),
+            data: shouldCompress ? null : cleanedData,
+            compressedData: shouldCompress ? dataString : null,
+            isCompressed: shouldCompress,
+            timestamp: now,
             recordCount: cleanedData.length,
-            version: '1.0'
+            version: '1.1',
+            date: new Date().toISOString(),
+            lastUpdate: now,
+            checksum: generateSimpleChecksum(cleanedData)
         };
+
+        const docSize = JSON.stringify(backupDoc).length;
+        if (docSize > 950000) { 
+            throw new Error('El respaldo es demasiado grande. Borra algunos registros y vuelve a intentar.');
+        }
 
         const docRef = await addDoc(collection(db, 'backups'), backupDoc);
         
@@ -52,11 +82,23 @@ export async function createCloudBackup() {
             success: true,
             backupId: docRef.id,
             recordCount: cleanedData.length,
-            date: new Date().toLocaleString('es-CL')
+            date: new Date().toLocaleString('es-CL'),
+            size: `${Math.round(docSize / 1024)} KB`
         };
 
     } catch (error) {
         console.error('Error al crear respaldo:', error);
+        
+        if (error.code === 'permission-denied') {
+            if (error.message.includes('size')) {
+                throw new Error('El respaldo es demasiado grande (máximo 1MB)');
+            } else if (error.message.includes('recordCount')) {
+                throw new Error('Demasiados registros (máximo 10,000)');
+            } else {
+                throw new Error('Operación denegada. Verifica que no estés haciendo respaldos muy frecuentes.');
+            }
+        }
+        
         throw new Error(`Error al crear respaldo: ${error.message}`);
     }
 }
@@ -92,7 +134,6 @@ export async function getLastCloudBackup() {
     }
 }
 
-
 export async function restoreCloudBackup(backupId) {
     try {
         const { importData, clearAllData } = await import('./dataManager.js');
@@ -106,12 +147,17 @@ export async function restoreCloudBackup(backupId) {
         
         const backupData = docSnapshot.data();
         
-        if (!backupData.data || !Array.isArray(backupData.data)) {
+        let dataToRestore;
+        if (backupData.isCompressed && backupData.compressedData) {
+            dataToRestore = JSON.parse(backupData.compressedData);
+        } else if (backupData.data && Array.isArray(backupData.data)) {
+            dataToRestore = backupData.data;
+        } else {
             throw new Error('El respaldo no contiene datos válidos');
         }
 
         await clearAllData();
-        await importData(backupData.data);
+        await importData(dataToRestore);
         
         return {
             success: true,
@@ -132,39 +178,63 @@ export async function checkCloudConnection() {
         await getDocs(q);
         return true;
     } catch (error) {
-        alert.error('Error de conexión a la nube:', error);
+        console.error('Error de conexión a la nube:', error);
         return false;
+    }
+}
+
+export async function cleanupOldBackups(daysToKeep = 90) {
+    try {
+        const cutoffDate = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
+        
+        const q = query(
+            collection(db, 'backups'),
+            where('timestamp', '<', cutoffDate),
+            orderBy('timestamp', 'asc'),
+            limit(10)
+        );
+        
+        const snapshot = await getDocs(q);
+        const batch = writeBatch(db);
+        
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        
+        if (snapshot.docs.length > 0) {
+            await batch.commit();
+            console.log(`Eliminados ${snapshot.docs.length} respaldos antiguos`);
+        }
+        
+        return { deleted: snapshot.docs.length };
+    } catch (error) {
+        console.error('Error al limpiar respaldos:', error);
+        throw error;
     }
 }
 
 export async function getBackupStats() {
     try {
-        const lastBackup = await getLastCloudBackup();
+        const q = query(
+            collection(db, 'backups'),
+            orderBy('timestamp', 'desc'),
+            limit(50)
+        );
         
-        if (!lastBackup) {
-            return {
-                hasBackup: false,
-                message: 'No hay respaldos en la nube'
-            };
-        }
-
-        const now = Date.now();
-        const backupAge = now - lastBackup.timestamp;
-        const daysOld = Math.floor(backupAge / (1000 * 60 * 60 * 24));
+        const snapshot = await getDocs(q);
+        const backups = snapshot.docs.map(doc => doc.data());
         
         return {
-            hasBackup: true,
-            recordCount: lastBackup.recordCount,
-            date: lastBackup.date,
-            daysOld: daysOld,
-            isRecent: daysOld <= 7
+            totalBackups: backups.length,
+            latestBackup: backups[0]?.date || 'Nunca',
+            totalRecords: backups.reduce((sum, b) => sum + (b.recordCount || 0), 0),
+            averageSize: backups.length > 0 
+                ? Math.round(backups.reduce((sum, b) => sum + (b.recordCount || 0), 0) / backups.length)
+                : 0,
+            oldestBackup: backups[backups.length - 1]?.date || 'Nunca'
         };
-        
     } catch (error) {
         console.error('Error al obtener estadísticas:', error);
-        return {
-            hasBackup: false,
-            message: 'Error al verificar respaldos'
-        };
+        return null;
     }
 }
