@@ -12,6 +12,9 @@ import { exportToExcel } from './modules/excelExporter.js';
 import { exportToJSON, importFromJSON } from './modules/jsonHandler.js';
 import { mostrarToast, resetForm, toggleFormButtons } from './modules/uiHelpers.js';
 import { renderPagination, paginateItems } from './modules/pagination.js';
+import { 
+    initializePWA, checkInstallPromotion, setupPWAFeatures 
+} from './modules/pwaInstaller.js';
 
 import { 
     createCloudBackup, 
@@ -28,6 +31,14 @@ let totalPages = 1;
 async function initializePage() {
     const path = window.location.pathname.split('/').pop();
 
+    try {
+        initializePWA();
+        setupPWAFeatures();
+        console.log('PWA: Características inicializadas correctamente');
+    } catch (error) {
+        console.warn('PWA: Error al inicializar características PWA:', error);
+    }
+
     setupCommonEventListeners();
     
     if (path.includes('balance.html')) {
@@ -37,6 +48,14 @@ async function initializePage() {
     } else {
         await initializeIndexPage();
     }
+
+    setTimeout(() => {
+        try {
+            checkInstallPromotion();
+        } catch (error) {
+            console.warn('PWA: Error al verificar promoción de instalación:', error);
+        }
+    }, 3000);
 }
 
 async function initializeBalancePage() {

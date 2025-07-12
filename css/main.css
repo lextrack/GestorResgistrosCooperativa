@@ -249,7 +249,6 @@ background-color: #bee5eb;
 color: #0c5460;
 }
 
-/* Dispositivos pequeños (teléfonos, 576px y menos) */
 @media (max-width: 576px) {
     body {
         padding: 0 10px;
