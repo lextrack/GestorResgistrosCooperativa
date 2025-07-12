@@ -1,8 +1,6 @@
-const CACHE_NAME = 'gestor-registros-cooperativa-v1.2.1';
+const CACHE_NAME = 'gestor-registros-cooperativa-v1.2.2';
 
-const basePath = self.location.pathname.includes('/GestorResgistrosCooperativa') 
-  ? '/GestorResgistrosCooperativa'
-  : '';
+const basePath = '/GestorResgistrosCooperativa';
 
 const urlsToCache = [
   `${basePath}/`,

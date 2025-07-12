@@ -11,9 +11,9 @@ export function initializePWA() {
 async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         try {
-            const basePath = window.location.pathname.includes('/GestorResgistrosCooperativa') 
-                ? '/GestorResgistrosCooperativa'
-                : '';
+            const basePath = '/GestorResgistrosCooperativa';
+            
+            console.log('PWA: Registrando SW en:', `${basePath}/sw.js`);
             
             const registration = await navigator.serviceWorker.register(`${basePath}/sw.js`, {
                 scope: `${basePath}/`
@@ -82,11 +82,15 @@ function createInstallButton() {
 }
 
 function showInstallButton() {
-    return;
+    if (installButton) {
+        installButton.style.display = 'block';
+    }
 }
 
 function hideInstallButton() {
-    return;
+    if (installButton) {
+        installButton.style.display = 'none';
+    }
 }
 
 async function installApp() {
@@ -256,7 +260,7 @@ function addPWAMetaTags() {
     
     const appleTouchIcon = document.createElement('link');
     appleTouchIcon.rel = 'apple-touch-icon';
-    appleTouchIcon.href = '/img/icon-192x192.png';
+    appleTouchIcon.href = '/GestorResgistrosCooperativa/img/icon-192x192.png';
     if (!document.querySelector('link[rel="apple-touch-icon"]')) {
         head.appendChild(appleTouchIcon);
     }
