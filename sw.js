@@ -1,25 +1,30 @@
-const CACHE_NAME = 'gestor-registros-cooperativa-v1.2.0';
+const CACHE_NAME = 'gestor-registros-cooperativa-v1.2.1';
+
+const basePath = self.location.pathname.includes('/GestorResgistrosCooperativa') 
+  ? '/GestorResgistrosCooperativa'
+  : '';
+
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/balance.html',
-  '/dashboard.html',
-  '/css/main.css',
-  '/css/modals.css',
-  '/js/main.js',
-  '/js/modules/dataManager.js',
-  '/js/modules/chartGenerator.js',
-  '/js/modules/cloudBackup.js',
-  '/js/modules/currencyFormatter.js',
-  '/js/modules/excelExporter.js',
-  '/js/modules/exportHandlers.js',
-  '/js/modules/jsonHandler.js',
-  '/js/modules/pagination.js',
-  '/js/modules/pdfExporter.js',
-  '/js/modules/uiHelpers.js',
-  '/img/icono.ico',
-  '/img/icon-192x192.png',
-  '/img/icon-512x512.png',
+  `${basePath}/`,
+  `${basePath}/index.html`,
+  `${basePath}/balance.html`,
+  `${basePath}/dashboard.html`,
+  `${basePath}/css/main.css`,
+  `${basePath}/css/modals.css`,
+  `${basePath}/js/main.js`,
+  `${basePath}/js/modules/dataManager.js`,
+  `${basePath}/js/modules/chartGenerator.js`,
+  `${basePath}/js/modules/cloudBackup.js`,
+  `${basePath}/js/modules/currencyFormatter.js`,
+  `${basePath}/js/modules/excelExporter.js`,
+  `${basePath}/js/modules/exportHandlers.js`,
+  `${basePath}/js/modules/jsonHandler.js`,
+  `${basePath}/js/modules/pagination.js`,
+  `${basePath}/js/modules/pdfExporter.js`,
+  `${basePath}/js/modules/uiHelpers.js`,
+  `${basePath}/img/icono.ico`,
+  `${basePath}/img/icon-192x192.png`,
+  `${basePath}/img/icon-512x512.png`,
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js',
@@ -38,6 +43,7 @@ self.addEventListener('install', event => {
         })));
       })
       .catch(error => {
+        console.log('Cache installation error:', error);
         return;
       })
   );
@@ -100,7 +106,7 @@ self.addEventListener('fetch', event => {
           })
           .catch(error => {
             if (event.request.destination === 'document') {
-              return caches.match('/index.html');
+              return caches.match(`${basePath}/index.html`);
             }
             throw error;
           });
@@ -133,15 +139,15 @@ async function handleBackgroundSync() {
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'Nueva actualización disponible',
-    icon: '/img/icon-192x192.png',
-    badge: '/img/icon-72x72.png',
+    icon: `${basePath}/img/icon-192x192.png`,
+    badge: `${basePath}/img/icon-72x72.png`,
     vibrate: [200, 100, 200],
     tag: 'gestor-notification',
     actions: [
       {
         action: 'open',
         title: 'Abrir App',
-        icon: '/img/icon-192x192.png'
+        icon: `${basePath}/img/icon-192x192.png`
       }
     ]
   };
@@ -156,7 +162,7 @@ self.addEventListener('notificationclick', event => {
   
   if (event.action === 'open' || !event.action) {
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow(`${basePath}/`)
     );
   }
 });

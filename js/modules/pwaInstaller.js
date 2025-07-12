@@ -11,8 +11,12 @@ export function initializePWA() {
 async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.register('/sw.js', {
-                scope: '/'
+            const basePath = window.location.pathname.includes('/GestorResgistrosCooperativa') 
+                ? '/GestorResgistrosCooperativa'
+                : '';
+            
+            const registration = await navigator.serviceWorker.register(`${basePath}/sw.js`, {
+                scope: `${basePath}/`
             });
             
             console.log('PWA: Service Worker registrado exitosamente:', registration.scope);

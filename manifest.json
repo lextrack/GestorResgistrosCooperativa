@@ -2,12 +2,12 @@
   "name": "Gestor Transacciones Cooperativa",
   "short_name": "Cooperativa",
   "description": "Gestiona las transacciones de la cooperativa con gráficos y estadísticas",
-  "start_url": "/",
+  "start_url": "/GestorResgistrosCooperativa/",
   "display": "standalone",
   "background_color": "#12181f",
   "theme_color": "#198754",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/GestorResgistrosCooperativa/",
   "lang": "es",
   "categories": ["finance", "productivity", "business"],
   "icons": [
@@ -65,7 +65,7 @@
       "name": "Nuevo Registro",
       "short_name": "Nuevo",
       "description": "Crear un nuevo registro de transacción",
-      "url": "/index.html",
+      "url": "/GestorResgistrosCooperativa/index.html",
       "icons": [
         {
           "src": "img/icon-192x192.png",
@@ -77,7 +77,7 @@
       "name": "Ver Balance",
       "short_name": "Balance",
       "description": "Ver gráfico de balance por categorías",
-      "url": "/balance.html",
+      "url": "/GestorResgistrosCooperativa/balance.html",
       "icons": [
         {
           "src": "img/icon-192x192.png",
@@ -89,7 +89,7 @@
       "name": "Estadísticas",
       "short_name": "Stats",
       "description": "Ver estadísticas detalladas",
-      "url": "/dashboard.html",
+      "url": "/GestorResgistrosCooperativa/dashboard.html",
       "icons": [
         {
           "src": "img/icon-192x192.png",
