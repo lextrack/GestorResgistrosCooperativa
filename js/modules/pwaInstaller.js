@@ -1,10 +1,8 @@
 let deferredPrompt;
-let installButton;
 
 export function initializePWA() {
     registerServiceWorker();
     setupInstallPrompt();
-    createInstallButton();
     handleAppUpdates();
 }
 
@@ -43,73 +41,14 @@ function setupInstallPrompt() {
     window.addEventListener('beforeinstallprompt', (e) => {
         console.log('PWA: beforeinstallprompt event fired');
         e.preventDefault();
-
         deferredPrompt = e;
-
-        showInstallButton();
     });
 
     window.addEventListener('appinstalled', (e) => {
         console.log('PWA: App instalada exitosamente');
-        hideInstallButton();
         showInstalledToast();
-
         deferredPrompt = null;
     });
-}
-
-function createInstallButton() {
-    if (!document.getElementById('pwa-install-btn')) {
-        installButton = document.createElement('button');
-        installButton.id = 'pwa-install-btn';
-        installButton.className = 'btn btn-success btn-sm position-fixed';
-        installButton.style.cssText = `
-            bottom: 20px;
-            right: 20px;
-            z-index: 1050;
-            display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border-radius: 25px;
-            padding: 8px 16px;
-            font-size: 12px;
-            font-weight: bold;
-        `;
-        installButton.innerHTML = '<i class="bi bi-download"></i> Instalar App';
-        installButton.addEventListener('click', installApp);
-        
-        document.body.appendChild(installButton);
-    }
-}
-
-function showInstallButton() {
-    if (installButton) {
-        installButton.style.display = 'block';
-    }
-}
-
-function hideInstallButton() {
-    if (installButton) {
-        installButton.style.display = 'none';
-    }
-}
-
-async function installApp() {
-    if (!deferredPrompt) {
-        console.log('PWA: No hay prompt de instalación disponible');
-        return;
-    }
-
-    deferredPrompt.prompt();
-
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-        console.log('PWA: Usuario aceptó la instalación');
-    } else {
-        console.log('PWA: Usuario rechazó la instalación');
-    }
-    deferredPrompt = null;
-    hideInstallButton();
 }
 
 function isAppInstalled() {
@@ -197,34 +136,7 @@ function handleAppUpdates() {
 }
 
 export function checkInstallPromotion() {
-    if (isAppInstalled()) {
-        console.log('PWA: App ya está instalada');
-        return;
-    }
-    
-    const checkUsage = async () => {
-        try {
-            const { getProductList } = await import('./dataManager.js');
-            const products = await getProductList();
-            
-            if (products.length > 5 && !isAppInstalled()) {
-                setTimeout(() => {
-                    if (window.mostrarToast && !document.getElementById('pwa-install-btn')?.style.display === 'block') {
-                        window.mostrarToast(
-                            'Instalar App', 
-                            '¿Sabías que puedes instalar esta app en tu dispositivo para un acceso más rápido?', 
-                            'info', 
-                            6000
-                        );
-                    }
-                }, 5000);
-            }
-        } catch (error) {
-            console.log('PWA: No se pudo verificar el uso de la app');
-        }
-    };
-    
-    checkUsage();
+    return;
 }
 
 export function setupPWAFeatures() {
@@ -269,7 +181,6 @@ function addPWAMetaTags() {
 function addPWAStyles() {
     const style = document.createElement('style');
     style.textContent = `
-        /* PWA specific styles */
         @media (display-mode: standalone) {
             body {
                 padding-top: env(safe-area-inset-top);
@@ -283,7 +194,6 @@ function addPWAStyles() {
             }
         }
         
-        /* Hide address bar on iOS */
         @supports (-webkit-touch-callout: none) {
             .container {
                 min-height: 100vh;
